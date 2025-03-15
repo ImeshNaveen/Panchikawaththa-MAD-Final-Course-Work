@@ -1,4 +1,6 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:panchikawaththa/pages/sign_up.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -156,6 +158,15 @@ class HomePage extends StatelessWidget {
                                   ),
                                 ),
                                 TextSpan(
+                                  recognizer: TapGestureRecognizer()
+                                    ..onTap = () {
+                                      // Navigate to logIn page
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => MyApp()),
+                                      );
+                                    },
                                   text: "Register",
                                   style: TextStyle(
                                     color: primaryColor,
