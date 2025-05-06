@@ -13,6 +13,7 @@ class RootPage extends StatelessWidget {
           style: TextStyle(color: Color.fromARGB(255, 255, 255, 255)),
         ),
         backgroundColor: myGreenColor,
+        centerTitle: true,
       ),
       body: Container(
         color: myGreenColor,
