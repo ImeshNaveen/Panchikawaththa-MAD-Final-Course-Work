@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'login_page.dart';
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class SignUpPage extends StatelessWidget {
+  const SignUpPage({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     Color myGreenColor = Color(0xFF02B91A);
@@ -265,7 +264,7 @@ class MyApp extends StatelessWidget {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => HomePage(),
+                                builder: (context) => LoginPage(),
                               ),
                             );
                           },

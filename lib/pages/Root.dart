@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'login_page.dart';
 import 'sign_up.dart';
+import 'home.dart';
 
 class RootPage extends StatelessWidget {
+  const RootPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     Color myGreenColor = Color(0xFF02B91A);
@@ -39,7 +42,7 @@ class RootPage extends StatelessWidget {
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => HomePage()),
+                        MaterialPageRoute(builder: (context) => homepage()),
                       );
                     },
                     child: Text('Home Page'),
@@ -64,7 +67,7 @@ class RootPage extends StatelessWidget {
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => HomePage()),
+                        MaterialPageRoute(builder: (context) => LoginPage()),
                       );
                     },
                     child: Text('Login Page'),
@@ -89,7 +92,7 @@ class RootPage extends StatelessWidget {
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => MyApp()),
+                        MaterialPageRoute(builder: (context) => SignUpPage()),
                       );
                     },
                     child: Text('Sign Up Page'),
