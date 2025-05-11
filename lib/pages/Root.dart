@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'login_page.dart';
 import 'sign_up.dart';
-import 'home.dart';
+import 'home_Page.dart';
 import 'notification.dart';
 
 class RootPage extends StatelessWidget {
@@ -43,7 +43,7 @@ class RootPage extends StatelessWidget {
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => homepage()),
+                        MaterialPageRoute(builder: (context) => HomePage()),
                       );
                     },
                     child: Text('Home Page'),
@@ -118,7 +118,8 @@ class RootPage extends StatelessWidget {
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => NotificationsPage()),
+                        MaterialPageRoute(
+                            builder: (context) => NotificationsPage()),
                       );
                     },
                     child: Text('notification Page'),

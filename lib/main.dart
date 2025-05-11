@@ -1,11 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:panchikawaththa/pages/Root.dart';
 import 'package:panchikawaththa/pages/SpashScreen.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'pages/main_layout.dart';
 
 void main() => runApp(
-      const MaterialApp(
-        debugShowCheckedModeBanner: false,
-        home: SplashScreen(),
+      ScreenUtilInit(
+        designSize: Size(375, 812), // base design size (width x height)
+        minTextAdapt: true,
+        builder: (context, child) {
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            home: SplashScreen(),
+          );
+        },
       ),
     );
 
@@ -45,3 +53,27 @@ void main() => runApp(
 //     );
 //   }
 // }
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ScreenUtilInit(
+      designSize: Size(375, 812), // iPhone X design reference
+      minTextAdapt: true,
+      builder: (context, child) {
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: 'Spare Parts UI',
+          theme: ThemeData(
+            fontFamily: 'Roboto',
+            scaffoldBackgroundColor: Colors.white,
+            useMaterial3: true,
+          ),
+          home: const MainLayout(), // This now wraps all bottom nav pages
+        );
+      },
+    );
+  }
+}
