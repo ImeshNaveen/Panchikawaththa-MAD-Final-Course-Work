@@ -2,8 +2,8 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:panchikawaththa/pages/sign_up.dart';
 
-class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+class LoginPage extends StatelessWidget {
+  const LoginPage({super.key});
 
   // Define the color as a variable
   static const Color primaryColor = Color.fromARGB(255, 20, 211, 3);
@@ -78,7 +78,7 @@ class HomePage extends StatelessWidget {
                                 color: primaryColor, // Use the variable here
                                 blurRadius: 20,
                                 offset: Offset(0, 10),
-                              )
+                              ),
                             ],
                           ),
                           child: Column(
@@ -87,9 +87,8 @@ class HomePage extends StatelessWidget {
                                 padding: EdgeInsets.all(10),
                                 decoration: BoxDecoration(
                                   border: Border(
-                                      bottom: BorderSide(
-                                          color:
-                                              primaryColor)), // Use the variable here
+                                    bottom: BorderSide(color: primaryColor),
+                                  ), // Use the variable here
                                 ),
                                 child: TextField(
                                   decoration: InputDecoration(
@@ -104,9 +103,8 @@ class HomePage extends StatelessWidget {
                                 padding: EdgeInsets.all(10),
                                 decoration: BoxDecoration(
                                   border: Border(
-                                      bottom: BorderSide(
-                                          color:
-                                              primaryColor)), // Use the variable here
+                                    bottom: BorderSide(color: primaryColor),
+                                  ), // Use the variable here
                                 ),
                                 child: TextField(
                                   decoration: InputDecoration(
@@ -158,15 +156,18 @@ class HomePage extends StatelessWidget {
                                   ),
                                 ),
                                 TextSpan(
-                                  recognizer: TapGestureRecognizer()
-                                    ..onTap = () {
-                                      // Navigate to logIn page
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) => MyApp()),
-                                      );
-                                    },
+                                  recognizer:
+                                      TapGestureRecognizer()
+                                        ..onTap = () {
+                                          // Navigate to logIn page
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder:
+                                                  (context) => SignUpPage(),
+                                            ),
+                                          );
+                                        },
                                   text: "Register",
                                   style: TextStyle(
                                     color: primaryColor,
@@ -188,8 +189,12 @@ class HomePage extends StatelessWidget {
                               width: 50, // Set width
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(50),
-                                color: const Color.fromARGB(255, 255, 255,
-                                    255), // Google's login button is usually white
+                                color: const Color.fromARGB(
+                                  255,
+                                  255,
+                                  255,
+                                  255,
+                                ), // Google's login button is usually white
                               ),
                               child: Center(
                                 child: Image.asset(
@@ -207,8 +212,10 @@ class HomePage extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(50),
                                 color: Colors.black,
                               ),
-                              child: Icon(Icons.apple,
-                                  color: Colors.white), // Added icon
+                              child: Icon(
+                                Icons.apple,
+                                color: Colors.white,
+                              ), // Added icon
                             ),
                             SizedBox(width: 20),
                             Container(
