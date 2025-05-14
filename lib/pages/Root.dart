@@ -3,6 +3,8 @@ import 'login_page.dart';
 import 'sign_up.dart';
 import 'home_Page.dart';
 import 'notification.dart';
+import 'cart_page.dart';
+import 'wishlist_page.dart';
 
 class RootPage extends StatelessWidget {
   const RootPage({super.key});
@@ -72,6 +74,31 @@ class RootPage extends StatelessWidget {
                       );
                     },
                     child: Text('Login Page'),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: TextButton(
+                    style: TextButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      backgroundColor: Colors.transparent,
+                      padding: EdgeInsets.all(16.0),
+                      textStyle: TextStyle(fontSize: 16),
+                      side: BorderSide(color: Colors.white),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                    ),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => CartPage()),
+                      );
+                    },
+                    child: Text('cart Page'),
                   ),
                 ),
               ),
@@ -169,6 +196,31 @@ class RootPage extends StatelessWidget {
                       print("Settings Page Pressed");
                     },
                     child: Text('Settings Page'),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: TextButton(
+                    style: TextButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      backgroundColor: Colors.transparent,
+                      padding: EdgeInsets.all(16.0),
+                      textStyle: TextStyle(fontSize: 16),
+                      side: BorderSide(color: Colors.white),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                    ),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => WishlistPage()),
+                      );
+                    },
+                    child: Text('wishaList Page'),
                   ),
                 ),
               ),
