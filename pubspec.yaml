@@ -76,6 +76,11 @@ flutter:
     - assets/light.jpg
     - assets/wheel.jpg
     - assets/product.png
+    - assets/airfilter.jpg
+    - assets/alternator.jpg
+    - assets/clutch_disc.jpg
+    
+    
 
     
   #   - images/a_dot_ham.jpeg
