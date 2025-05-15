@@ -3,10 +3,11 @@ import 'login_page.dart';
 import 'sign_up.dart';
 import 'home_Page.dart';
 import 'notification.dart';
+import 'profile_page.dart';
 import 'cart_page.dart';
-import 'wishlist_page.dart';
 import 'search.dart';
 import 'category.dart';
+import 'wishlist_page.dart';
 
 class RootPage extends StatelessWidget {
   const RootPage({super.key});
@@ -171,10 +172,12 @@ class RootPage extends StatelessWidget {
                       ),
                     ),
                     onPressed: () {
-                      // Add navigation to ProfilePage here
-                      print("Profile Page Pressed");
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => Profilepage()),
+                      );
                     },
-                    child: Text('Profile Page'),
+                    child: Text('profile Page'),
                   ),
                 ),
               ),
