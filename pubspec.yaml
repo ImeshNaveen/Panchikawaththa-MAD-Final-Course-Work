@@ -70,12 +70,20 @@ flutter:
     - assets/google1.png
     - assets/bell.png
     - assets/logo.png
+    - assets/logoL.png
     - assets/profile.jpeg
     - assets/brake.jpg
     - assets/Engine.png
     - assets/light.jpg
     - assets/wheel.jpg
     - assets/product.png
+    - assets/airfilter.jpg
+    - assets/alternator.jpg
+    - assets/clutch_disc.jpg
+    - assets/clutch_disc.jpg
+    - assets/alternator.jpg
+    - assets/airfilter.jpg
+    - assets/dvd.jpg
 
     
   #   - images/a_dot_ham.jpeg
