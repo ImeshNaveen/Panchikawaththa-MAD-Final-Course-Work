@@ -10,6 +10,7 @@ import 'category.dart';
 import 'wishlist_page.dart';
 import 'edit_profile_page.dart';
 import 'add_new_card_page.dart';
+import 'setting_page.dart';
 
 class RootPage extends StatelessWidget {
   const RootPage({super.key});
@@ -251,10 +252,13 @@ class RootPage extends StatelessWidget {
                       ),
                     ),
                     onPressed: () {
-                      // Add navigation to SettingsPage here
-                      print("Settings Page Pressed");
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => SettingPage()),
+                      );
                     },
-                    child: Text('Settings Page'),
+                    child: Text('Setting Page'),
                   ),
                 ),
               ),
