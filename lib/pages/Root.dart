@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:panchikawaththa/pages/profile_page.dart';
 import 'login_page.dart';
 import 'sign_up.dart';
 import 'home_Page.dart';
@@ -169,8 +170,10 @@ class RootPage extends StatelessWidget {
                       ),
                     ),
                     onPressed: () {
-                      // Add navigation to ProfilePage here
-                      print("Profile Page Pressed");
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => ProfilePage()),
+                      );
                     },
                     child: Text('Profile Page'),
                   ),
