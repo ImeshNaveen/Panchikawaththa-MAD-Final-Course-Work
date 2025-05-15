@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:panchikawaththa/utils/dialogs.dart';
 
 class SearchPage extends StatelessWidget {
   SearchPage({super.key});
@@ -106,7 +107,10 @@ class SearchPage extends StatelessWidget {
                     Text("Price: lowest to high",
                         style: TextStyle(fontSize: 14.sp)),
                     SizedBox(width: 12.w),
-                    Icon(Icons.filter_list, size: 20.sp),
+                    IconButton(
+                      icon: Icon(Icons.filter_list),
+                      onPressed: () => showFilterPopup(context),
+                    ),
                     Text(" Filters", style: TextStyle(fontSize: 14.sp)),
                   ],
                 )
