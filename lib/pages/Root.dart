@@ -12,6 +12,7 @@ import 'edit_profile_page.dart';
 import 'add_new_card_page.dart';
 import 'setting_page.dart';
 import 'help_center_page.dart';
+import 'store_coupon_page.dart';
 
 class RootPage extends StatelessWidget {
   const RootPage({super.key});
@@ -185,7 +186,7 @@ class RootPage extends StatelessWidget {
                   ),
                 ),
               ),
-               Padding(
+              Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8.0),
                 child: SizedBox(
                   width: double.infinity,
@@ -203,10 +204,37 @@ class RootPage extends StatelessWidget {
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => HelpCenterPage()),
+                        MaterialPageRoute(
+                            builder: (context) => HelpCenterPage()),
                       );
                     },
                     child: Text('Help center Page'),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: TextButton(
+                    style: TextButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      backgroundColor: Colors.transparent,
+                      padding: EdgeInsets.all(16.0),
+                      textStyle: TextStyle(fontSize: 16),
+                      side: BorderSide(color: Colors.white),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                    ),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => StoreCouponPage()),
+                      );
+                    },
+                    child: Text('Store Coupon Page'),
                   ),
                 ),
               ),
@@ -280,8 +308,7 @@ class RootPage extends StatelessWidget {
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(
-                            builder: (context) => SettingPage()),
+                        MaterialPageRoute(builder: (context) => SettingPage()),
                       );
                     },
                     child: Text('Setting Page'),
