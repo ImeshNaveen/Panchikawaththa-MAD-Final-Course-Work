@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:panchikawaththa/utils/dialogs.dart';
 
 class CategoryPage extends StatelessWidget {
   CategoryPage({super.key});
@@ -77,7 +78,10 @@ class CategoryPage extends StatelessWidget {
                       TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
                 ),
                 Spacer(),
-                Icon(Icons.filter_list),
+                IconButton(
+                  icon: Icon(Icons.filter_list),
+                  onPressed: () => showFilterPopup(context),
+                ),
               ],
             ),
             SizedBox(height: 16.h),
