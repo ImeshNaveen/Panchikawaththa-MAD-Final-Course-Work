@@ -106,8 +106,7 @@ class AccountPage extends StatelessWidget {
                       children: [
                         CircleAvatar(
                           radius: 30,
-                          backgroundImage:
-                              NetworkImage('https://via.placeholder.com/60'),
+                          backgroundImage: AssetImage("assets/profile.jpeg"),
                         ),
                         const SizedBox(height: 8),
                         Container(
