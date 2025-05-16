@@ -21,7 +21,7 @@ class _MainLayoutState extends State<MainLayout> {
     CartPage(),
     NotificationsPage(),
     WishlistPage(),
-    ProfilePage(),
+    Profilepage(),
   ];
 
   @override

@@ -19,7 +19,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: '>=3.0.0 <4.0.0'
+  sdk: ^3.6.1
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -77,17 +77,13 @@ flutter:
     - assets/light.jpg
     - assets/wheel.jpg
     - assets/product.png
-<<<<<<< Updated upstream
     - assets/airfilter.jpg
     - assets/alternator.jpg
     - assets/clutch_disc.jpg
-    
-    
-=======
     - assets/clutch_disc.jpg
     - assets/alternator.jpg
     - assets/airfilter.jpg
->>>>>>> Stashed changes
+    - assets/dvd.jpg
 
     
   #   - images/a_dot_ham.jpeg
