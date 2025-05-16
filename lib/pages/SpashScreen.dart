@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:panchikawaththa/pages/Root.dart';
+import 'package:panchikawaththa/pages/main_layout.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -26,7 +27,7 @@ class _SplashScreenState extends State<SplashScreen> {
       backgroundColor: Colors.black,
       body: Center(
         child: Image(
-          image: AssetImage('assets/logo.png'),
+          image: AssetImage('assets/logoL.png'),
           width: 200,
           height: 200,
         ),
