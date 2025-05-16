@@ -9,7 +9,6 @@ import 'search.dart';
 import 'category.dart';
 import 'wishlist_page.dart';
 import 'edit_profile_page.dart';
-import 'add_new_card_page.dart';
 import 'setting_page.dart';
 import 'help_center_page.dart';
 import 'store_coupon_page.dart';
@@ -285,8 +284,7 @@ class RootPage extends StatelessWidget {
                       onPressed: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(
-                              builder: (context) => AddNewCardPage()),
+                          MaterialPageRoute(builder: (context) => CartPage()),
                         );
                       },
                       child: Text('Add New Card Page'),
