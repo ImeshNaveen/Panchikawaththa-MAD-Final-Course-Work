@@ -89,7 +89,7 @@ class LoginPage extends StatelessWidget {
                                     padding: EdgeInsets.all(8),
                                     child: TextField(
                                       decoration: InputDecoration(
-                                        hintText: "Email",
+                                        hintText: "Email or Phone number",
                                         hintStyle:
                                             TextStyle(color: Colors.grey),
                                         border: InputBorder.none,
