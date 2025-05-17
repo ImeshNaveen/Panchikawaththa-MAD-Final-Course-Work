@@ -66,9 +66,8 @@ class _CartPageState extends State<CartPage> {
             SizedBox(height: 40.h),
             Row(
               children: [
-                Icon(Icons.arrow_back),
                 SizedBox(width: 10.w),
-                Text('Cart(5)',
+                Text('My Cart',
                     style: TextStyle(
                         fontSize: 18.sp, fontWeight: FontWeight.bold)),
                 Spacer(),
