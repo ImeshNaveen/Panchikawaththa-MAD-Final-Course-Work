@@ -62,7 +62,12 @@ class NotificationsPage extends StatelessWidget {
         appBar: AppBar(
           title: Text('Notifications',
               style: TextStyle(fontWeight: FontWeight.bold)),
-          leading: IconButton(icon: Icon(Icons.arrow_back), onPressed: () {}),
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back_ios),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
           actions: [
             IconButton(
                 icon: Icon(Icons.cleaning_services_outlined), onPressed: () {})

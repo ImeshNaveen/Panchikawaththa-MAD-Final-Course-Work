@@ -16,7 +16,7 @@ class _SplashScreenState extends State<SplashScreen> {
     Future.delayed(const Duration(seconds: 3), () {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const RootPage()),
+        MaterialPageRoute(builder: (context) => const MainLayout()),
       );
     });
   }
@@ -24,10 +24,10 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return const Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Color.fromARGB(255, 255, 255, 255),
       body: Center(
         child: Image(
-          image: AssetImage('assets/logoL.png'),
+          image: AssetImage('assets/logo.png'),
           width: 200,
           height: 200,
         ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:panchikawaththa/pages/notification.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -29,37 +30,47 @@ class HomePage extends StatelessWidget {
                       style: TextStyle(fontSize: 12.sp),
                     ),
                   ),
-                  Icon(Icons.notifications_none, size: 26.sp),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => NotificationsPage()),
+                      );
+                    },
+                    child: Icon(Icons.notifications_none, size: 26.sp),
+                  ),
                 ],
               ),
-              SizedBox(height: 20.h),
-              GestureDetector(
-                onTap: () {
-                  // Add your search functionality here
-                  print("Search bar tapped");
-                  // Example: Navigate to a search page
-                  // Navigator.push(context, MaterialPageRoute(builder: (context) => SearchPage()));
-                },
-                child: Container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 16.w,
-                    vertical: 12.h,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[200],
-                    borderRadius: BorderRadius.circular(16.r),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(Icons.search, color: Colors.grey),
-                      SizedBox(width: 10.w),
-                      Text(
-                        'Search',
-                        style: TextStyle(color: Colors.grey, fontSize: 16.sp),
+              SizedBox(height: 24.h),
+              Row(
+                children: [
+                  SizedBox(width: 10.w),
+                  Expanded(
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 12.w),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[200],
+                        borderRadius: BorderRadius.circular(20.r),
                       ),
-                    ],
+                      child: Row(
+                        children: [
+                          Icon(Icons.search, color: Colors.grey),
+                          SizedBox(width: 8.w),
+                          Expanded(
+                            child: TextField(
+                              decoration: InputDecoration(
+                                hintText: "Search for products",
+                                border: InputBorder.none,
+                              ),
+                            ),
+                          ),
+                          Icon(Icons.mic, color: Colors.grey),
+                        ],
+                      ),
+                    ),
                   ),
-                ),
+                ],
               ),
               SizedBox(height: 24.h),
               Text(
