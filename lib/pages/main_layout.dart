@@ -4,7 +4,8 @@ import 'home_page.dart';
 import 'cart_page.dart';
 import 'search.dart';
 import 'wishlist_page.dart';
-import 'profile_page.dart';
+//import 'profile_page.dart';
+import 'account_details.dart';
 
 class MainLayout extends StatefulWidget {
   const MainLayout({super.key});
@@ -21,7 +22,7 @@ class _MainLayoutState extends State<MainLayout> {
     CartPage(),
     SearchPage(),
     WishlistPage(),
-    Profilepage(),
+    AccountDetails(),
   ];
 
   @override
@@ -60,7 +61,7 @@ class _MainLayoutState extends State<MainLayout> {
                 activeColor: Color(0xFF02B91A),
               ),
               navItem(
-                icon: Icons.account_circle, // <-- Account icon
+                icon: Icons.account_circle,
                 index: 4,
                 activeColor: Color(0xFF02B91A),
               ),
