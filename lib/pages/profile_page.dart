@@ -1,4 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:panchikawaththa/pages/add_new_card_page.dart';
+import 'package:panchikawaththa/pages/edit_profile_page.dart';
+import 'package:panchikawaththa/pages/help_center_page.dart';
+import 'package:panchikawaththa/pages/return_details_page.dart';
+import 'package:panchikawaththa/pages/save_card_page.dart';
+import 'package:panchikawaththa/pages/store_coupon_page.dart';
 import 'setting_page.dart';
 import 'notification.dart';
 
@@ -130,23 +136,33 @@ class AccountPage extends StatelessWidget {
                           backgroundImage: AssetImage("assets/profile.jpeg"),
                         ),
                         const SizedBox(height: 8),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 6),
-                          decoration: BoxDecoration(
-                            color: Colors.green,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Row(
-                            children: const [
-                              Text(
-                                'Edit Profile',
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 12),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => EditProfilePage(),
                               ),
-                              Icon(Icons.arrow_forward_ios,
-                                  size: 12, color: Colors.white),
-                            ],
+                            );
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: Colors.green,
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Row(
+                              children: const [
+                                Text(
+                                  'Edit Profile',
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 12),
+                                ),
+                                Icon(Icons.arrow_forward_ios,
+                                    size: 12, color: Colors.white),
+                              ],
+                            ),
                           ),
                         ),
                       ],
@@ -162,10 +178,46 @@ class AccountPage extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  _buildMenuItem(Icons.headset, 'Help Center'),
-                  _buildMenuItem(Icons.credit_card, 'Cards'),
-                  _buildMenuItem(Icons.keyboard_return, 'Return'),
-                  _buildMenuItem(Icons.card_giftcard, 'Coupons'),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => HelpCenterPage()),
+                      );
+                    },
+                    child: _buildMenuItem(Icons.headset, 'Help Center'),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => SavedCardsPage()),
+                      );
+                    },
+                    child: _buildMenuItem(Icons.credit_card, 'Cards'),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => ReturnDetailsPage()),
+                      );
+                    },
+                    child: _buildMenuItem(Icons.keyboard_return, 'Return'),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => StoreCouponPage()),
+                      );
+                    },
+                    child: _buildMenuItem(Icons.card_giftcard, 'Coupons'),
+                  ),
                 ],
               ),
             ),

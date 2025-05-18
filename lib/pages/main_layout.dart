@@ -4,7 +4,8 @@ import 'home_page.dart';
 import 'cart_page.dart';
 import 'search.dart';
 import 'wishlist_page.dart';
-import 'profile_page.dart';
+//import 'profile_page.dart';
+import 'account_details.dart';
 
 class MainLayout extends StatefulWidget {
   const MainLayout({super.key});
@@ -21,7 +22,7 @@ class _MainLayoutState extends State<MainLayout> {
     CartPage(),
     SearchPage(),
     WishlistPage(),
-    Profilepage(),
+    AccountDetails(),
   ];
 
   @override
@@ -59,23 +60,10 @@ class _MainLayoutState extends State<MainLayout> {
                 index: 3,
                 activeColor: Color(0xFF02B91A),
               ),
-              GestureDetector(
-                onTap: () => setState(() => _currentIndex = 4),
-                child: Container(
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: _currentIndex == 4
-                          ? Colors.greenAccent
-                          : Colors.transparent,
-                      width: 2,
-                    ),
-                  ),
-                  child: CircleAvatar(
-                    radius: 14.r,
-                    backgroundImage: AssetImage("assets/profile.jpeg"),
-                  ),
-                ),
+              navItem(
+                icon: Icons.account_circle,
+                index: 4,
+                activeColor: Color(0xFF02B91A),
               ),
             ],
           ),
