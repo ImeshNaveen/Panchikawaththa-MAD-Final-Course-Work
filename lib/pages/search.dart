@@ -64,7 +64,6 @@ class SearchPage extends StatelessWidget {
             // Search bar
             Row(
               children: [
-                Icon(Icons.arrow_back),
                 SizedBox(width: 10.w),
                 Expanded(
                   child: Container(

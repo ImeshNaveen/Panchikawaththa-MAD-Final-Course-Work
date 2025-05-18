@@ -69,55 +69,58 @@ class LoginPage extends StatelessWidget {
                     child: Column(
                       children: [
                         SizedBox(height: 60),
-                        Container(
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(10),
-                            boxShadow: [
-                              BoxShadow(
-                                color: primaryColor, // Use the variable here
-                                blurRadius: 20,
-                                offset: Offset(0, 10),
-                              ),
-                            ],
-                          ),
-                          child: Column(
-                            children: [
-                              Container(
-                                padding: EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  border: Border(
-                                    bottom: BorderSide(color: primaryColor),
-                                  ), // Use the variable here
-                                ),
-                                child: TextField(
-                                  decoration: InputDecoration(
-                                    hintText: "Email or Phone number",
-                                    hintStyle: TextStyle(color: Colors.black),
-                                    border: InputBorder.none,
+                        Column(
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(30),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.green[200]!,
+                                    blurRadius: 20,
+                                    offset: Offset(0, 10),
                                   ),
-                                ),
+                                ],
                               ),
-                              SizedBox(height: 15), // Space between fields
-                              Container(
-                                padding: EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  border: Border(
-                                    bottom: BorderSide(color: primaryColor),
-                                  ), // Use the variable here
-                                ),
-                                child: TextField(
-                                  decoration: InputDecoration(
-                                    hintText: "Password",
-                                    hintStyle: TextStyle(color: Colors.black),
-                                    border: InputBorder.none,
+                              child: Column(
+                                children: [
+                                  Container(
+                                    padding: EdgeInsets.all(8),
+                                    child: TextField(
+                                      decoration: InputDecoration(
+                                        hintText: "Email or Phone number",
+                                        hintStyle:
+                                            TextStyle(color: Colors.grey),
+                                        border: InputBorder.none,
+                                        contentPadding:
+                                            EdgeInsets.only(left: 10),
+                                      ),
+                                    ),
                                   ),
-                                ),
+                                ],
                               ),
-                            ],
-                          ),
+                            ),
+                            SizedBox(height: 35), // Space between fields
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(30),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.green[200]!,
+                                    blurRadius: 20,
+                                    offset: Offset(0, 10),
+                                  ),
+                                ],
+                              ),
+                              child: Column(
+                                children: [Container(child: PasswordField())],
+                              ),
+                            ),
+                          ],
                         ),
-                        SizedBox(height: 40),
+                        SizedBox(height: 20),
                         Text(
                           "Forgot Password?",
                           style: TextStyle(color: Colors.grey),
@@ -156,18 +159,16 @@ class LoginPage extends StatelessWidget {
                                   ),
                                 ),
                                 TextSpan(
-                                  recognizer:
-                                      TapGestureRecognizer()
-                                        ..onTap = () {
-                                          // Navigate to logIn page
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder:
-                                                  (context) => SignUpPage(),
-                                            ),
-                                          );
-                                        },
+                                  recognizer: TapGestureRecognizer()
+                                    ..onTap = () {
+                                      // Navigate to logIn page
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => SignUpPage(),
+                                        ),
+                                      );
+                                    },
                                   text: "Register",
                                   style: TextStyle(
                                     color: primaryColor,

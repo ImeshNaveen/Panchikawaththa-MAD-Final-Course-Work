@@ -6,12 +6,16 @@ import 'pages/main_layout.dart';
 
 void main() => runApp(
       ScreenUtilInit(
-        designSize: Size(375, 812), // base design size (width x height)
+        designSize: const Size(375, 812),
         minTextAdapt: true,
         builder: (context, child) {
           return MaterialApp(
             debugShowCheckedModeBanner: false,
-            home: SplashScreen(),
+            initialRoute: '/splash',
+            routes: {
+              '/splash': (context) => const SplashScreen(),
+              '/home_page': (context) => const MainLayout(),
+            },
           );
         },
       ),
