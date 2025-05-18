@@ -9,70 +9,128 @@ class ChangePasswordPage extends StatefulWidget {
 
 class _ChangePasswordPageState extends State<ChangePasswordPage> {
   final _formKey = GlobalKey<FormState>();
-  final _currentPasswordController = TextEditingController();
-  final _newPasswordController = TextEditingController();
-  final _confirmPasswordController = TextEditingController();
 
-  @override
-  void dispose() {
-    _currentPasswordController.dispose();
-    _newPasswordController.dispose();
-    _confirmPasswordController.dispose();
-    super.dispose();
+  final TextEditingController currentController = TextEditingController();
+  final TextEditingController newController = TextEditingController();
+  final TextEditingController confirmController = TextEditingController();
+
+  bool _obscureCurrent = true;
+  bool _obscureNew = true;
+  bool _obscureConfirm = true;
+
+  void _changePassword() {
+    if (_formKey.currentState!.validate()) {
+      // Simulate password check
+      if (currentController.text != "user_current_password") {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Current password is incorrect")),
+        );
+        return;
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Password changed successfully")),
+      );
+
+      // Clear fields
+      currentController.clear();
+      newController.clear();
+      confirmController.clear();
+    }
   }
 
-  void _submitForm() {
-    if (_formKey.currentState!.validate()) {
-      // Add your password change logic here
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Password changed successfully!')),
-      );
-      Navigator.pop(context);
-    }
+  InputDecoration _inputDecoration(
+      String label, bool obscure, VoidCallback toggle) {
+    return InputDecoration(
+      labelText: label,
+      labelStyle: const TextStyle(color: Colors.grey),
+      floatingLabelStyle: const TextStyle(color: Colors.green),
+      border: const OutlineInputBorder(),
+      enabledBorder: const OutlineInputBorder(
+        borderSide: BorderSide(color: Colors.grey),
+      ),
+      focusedBorder: const OutlineInputBorder(
+        borderSide: BorderSide(color: Colors.green, width: 2),
+      ),
+      suffixIcon: IconButton(
+        icon: Icon(obscure ? Icons.visibility_off : Icons.visibility),
+        onPressed: toggle,
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Change Password")),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+      appBar: AppBar(
+        title: const Text("Change Password"),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context), // ← Go back on tap
+        ),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(24),
         child: Form(
           key: _formKey,
           child: Column(
             children: [
               TextFormField(
-                controller: _currentPasswordController,
+                controller: currentController,
+                obscureText: _obscureCurrent,
                 decoration:
-                    const InputDecoration(labelText: "Current Password"),
-                obscureText: true,
-                validator: (value) =>
-                    value!.isEmpty ? "Enter your current password" : null,
+                    _inputDecoration("Current Password", _obscureCurrent, () {
+                  setState(() => _obscureCurrent = !_obscureCurrent);
+                }),
+                validator: (value) => value == null || value.isEmpty
+                    ? "Enter current password"
+                    : null,
               ),
+              const SizedBox(height: 20),
               TextFormField(
-                controller: _newPasswordController,
-                decoration: const InputDecoration(labelText: "New Password"),
-                obscureText: true,
-                validator: (value) =>
-                    value!.length < 6 ? "Minimum 6 characters" : null,
+                controller: newController,
+                obscureText: _obscureNew,
+                decoration: _inputDecoration("New Password", _obscureNew, () {
+                  setState(() => _obscureNew = !_obscureNew);
+                }),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return "Enter new password";
+                  } else if (value.length < 6) {
+                    return "Password must be at least 6 characters";
+                  }
+                  return null;
+                },
               ),
+              const SizedBox(height: 20),
               TextFormField(
-                controller: _confirmPasswordController,
-                decoration:
-                    const InputDecoration(labelText: "Confirm Password"),
-                obscureText: true,
-                validator: (value) => value != _newPasswordController.text
+                controller: confirmController,
+                obscureText: _obscureConfirm,
+                decoration: _inputDecoration(
+                    "Confirm New Password", _obscureConfirm, () {
+                  setState(() => _obscureConfirm = !_obscureConfirm);
+                }),
+                validator: (value) => value != newController.text
                     ? "Passwords do not match"
                     : null,
               ),
-              const SizedBox(height: 24),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
-                  foregroundColor: Colors.white,
+              const SizedBox(height: 30),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: _changePassword,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30)),
+                  ),
+                  child: const Text(
+                    "Change Password",
+                    style: TextStyle(fontSize: 16),
+                  ),
                 ),
-                onPressed: _submitForm,
-                child: const Text("Change Password"),
               ),
             ],
           ),

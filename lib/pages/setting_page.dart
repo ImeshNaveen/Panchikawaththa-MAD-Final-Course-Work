@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:panchikawaththa/pages/ManageAddressPage.dart';
+import 'package:panchikawaththa/pages/TwoFactorPage.dart';
 import 'package:panchikawaththa/pages/change_password_page.dart';
 import 'package:panchikawaththa/pages/contactUs.dart';
+import 'package:panchikawaththa/pages/edit_profile_page.dart';
 import 'package:panchikawaththa/pages/help_center_page.dart';
 import 'package:panchikawaththa/pages/languageSettings.dart';
+import 'package:panchikawaththa/pages/leaveFeadback.dart';
+import 'package:panchikawaththa/pages/logout.dart';
 import 'package:panchikawaththa/pages/notificationSetting.dart';
+import 'package:panchikawaththa/pages/paymentMethodSetting.dart';
 import 'package:panchikawaththa/pages/privacy.dart';
 import 'package:panchikawaththa/pages/reportProblem.dart';
 import 'package:panchikawaththa/pages/tearms_conditions.dart';
@@ -36,7 +41,7 @@ class SettingPage extends StatelessWidget {
           SettingsTile(
               title: 'Edit Profile',
               icon: Icons.person,
-              page: const EditProfile_Page()),
+              page: const EditProfilePage()),
           SettingsTile(
               title: 'Manage Address',
               icon: Icons.location_on,
@@ -130,32 +135,6 @@ class SettingsTile extends StatelessWidget {
   }
 }
 
-class TwoFactorPage extends StatelessWidget {
-  const TwoFactorPage({super.key});
-  @override
-  Widget build(BuildContext context) =>
-      _buildScreen(context, 'Two-Factor Authentication');
-}
-
-class LogoutPage extends StatelessWidget {
-  const LogoutPage({super.key});
-  @override
-  Widget build(BuildContext context) => _buildScreen(context, 'Logout');
-}
-
-class EditProfile_Page extends StatelessWidget {
-  const EditProfile_Page({super.key});
-  @override
-  Widget build(BuildContext context) => _buildScreen(context, 'Edit Profile');
-}
-
-class PaymentMethodsPage extends StatelessWidget {
-  const PaymentMethodsPage({super.key});
-  @override
-  Widget build(BuildContext context) =>
-      _buildScreen(context, 'Payment Methods');
-}
-
 class ThemeModePage extends StatelessWidget {
   const ThemeModePage({super.key});
   @override
@@ -166,12 +145,6 @@ class NotificationPage extends StatelessWidget {
   const NotificationPage({super.key});
   @override
   Widget build(BuildContext context) => _buildScreen(context, 'Notifications');
-}
-
-class LeaveFeedbackPage extends StatelessWidget {
-  const LeaveFeedbackPage({super.key});
-  @override
-  Widget build(BuildContext context) => _buildScreen(context, 'Leave Feedback');
 }
 
 Widget _buildScreen(BuildContext context, String title) {

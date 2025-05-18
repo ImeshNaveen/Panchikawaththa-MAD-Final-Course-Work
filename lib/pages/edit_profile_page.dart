@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:panchikawaththa/pages/notification.dart';
 
 void main() {
   runApp(const EditProfilePage());
@@ -9,15 +10,7 @@ class EditProfilePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'User Profile Edit',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        scaffoldBackgroundColor: Colors.white,
-      ),
-      home: const UserProfileEditScreen(),
-      debugShowCheckedModeBanner: false,
-    );
+    return UserProfileEditScreen();
   }
 }
 
@@ -85,7 +78,13 @@ class _UserProfileEditScreenState extends State<UserProfileEditScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.notifications_outlined, color: Colors.black),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => NotificationsPage(),
+                ),
+              );
+            },
           ),
         ],
       ),
