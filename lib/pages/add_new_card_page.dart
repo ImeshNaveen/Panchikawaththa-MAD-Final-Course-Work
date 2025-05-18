@@ -30,9 +30,9 @@ class AddCardScreen extends StatefulWidget {
 
 class _AddCardScreenState extends State<AddCardScreen> {
   final _cardNumberController = TextEditingController();
-  final _cardNameController = TextEditingController(text: "Imesh Naveen");
-  final _expirationController = TextEditingController(text: "01/27");
-  final _cvvController = TextEditingController(text: "833");
+  final _cardNameController = TextEditingController();
+  final _expirationController = TextEditingController();
+  final _cvvController = TextEditingController();
 
   @override
   void dispose() {
@@ -51,7 +51,9 @@ class _AddCardScreenState extends State<AddCardScreen> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () {},
+          onPressed: () {
+            Navigator.pop(context);
+          },
         ),
         title: const Text(
           "Add New Card",
@@ -251,6 +253,11 @@ class _AddCardScreenState extends State<AddCardScreen> {
             TextField(
               controller: _cardNameController,
               decoration: InputDecoration(
+                hintText: "Name on Card", // <-- Added placeholder
+                hintStyle: TextStyle(
+                  color: Colors.grey,
+                  fontSize: 16,
+                ),
                 filled: true,
                 fillColor: Colors.grey[200],
                 border: OutlineInputBorder(
@@ -285,7 +292,11 @@ class _AddCardScreenState extends State<AddCardScreen> {
                       TextField(
                         controller: _expirationController,
                         decoration: InputDecoration(
-                          hintText: "Date",
+                          hintText: "MM/YY", // <-- Added placeholder
+                          hintStyle: TextStyle(
+                            color: Colors.grey,
+                            fontSize: 16,
+                          ),
                           filled: true,
                           fillColor: Colors.grey[200],
                           border: OutlineInputBorder(
@@ -328,6 +339,11 @@ class _AddCardScreenState extends State<AddCardScreen> {
                       TextField(
                         controller: _cvvController,
                         decoration: InputDecoration(
+                          hintText: "CVV", // <-- Added placeholder
+                          hintStyle: TextStyle(
+                            color: Colors.grey,
+                            fontSize: 16,
+                          ),
                           filled: true,
                           fillColor: Colors.grey[200],
                           border: OutlineInputBorder(

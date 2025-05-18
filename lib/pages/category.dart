@@ -70,7 +70,13 @@ class CategoryPage extends StatelessWidget {
             // Top Bar
             Row(
               children: [
-                Icon(Icons.arrow_back),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.pop(
+                        context); // Navigate back to previous/home screen
+                  },
+                  child: Icon(Icons.arrow_back),
+                ),
                 SizedBox(width: 8.w),
                 Text(
                   'Wheels, Tires & Parts',

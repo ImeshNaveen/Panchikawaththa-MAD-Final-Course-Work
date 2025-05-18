@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:panchikawaththa/pages/category.dart';
 import 'package:panchikawaththa/pages/notification.dart';
+import 'package:panchikawaththa/pages/productDetailpage.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -83,10 +85,46 @@ class HomePage extends StatelessWidget {
                 child: ListView(
                   scrollDirection: Axis.horizontal,
                   children: [
-                    categoryItem("wheel.jpg"),
-                    categoryItem("Engine.png"),
-                    categoryItem("brake.jpg"),
-                    categoryItem("light.jpg"),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => CategoryPage()),
+                        );
+                      },
+                      child: categoryItem("wheel.jpg"),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => CategoryPage()),
+                        );
+                      },
+                      child: categoryItem("Engine.png"),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => CategoryPage()),
+                        );
+                      },
+                      child: categoryItem("brake.jpg"),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => CategoryPage()),
+                        );
+                      },
+                      child: categoryItem("light.jpg"),
+                    ),
                   ],
                 ),
               ),
@@ -107,7 +145,7 @@ class HomePage extends StatelessWidget {
                   childAspectRatio: 0.7,
                 ),
                 itemBuilder: (context, index) {
-                  return dealCard();
+                  return dealCard(context);
                 },
               ),
             ],
@@ -128,7 +166,7 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  Widget dealCard() {
+  Widget dealCard(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -141,57 +179,66 @@ class HomePage extends StatelessWidget {
           ),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.vertical(top: Radius.circular(12.r)),
-            child: Image.asset(
-              "assets/product.png",
-              height: 100.h,
-              width: double.infinity,
-              fit: BoxFit.cover,
+      child: InkWell(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => ProductDetailPage()),
+          );
+        },
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.vertical(top: Radius.circular(12.r)),
+              child: Image.asset(
+                "assets/product.png",
+                height: 100.h,
+                width: double.infinity,
+                fit: BoxFit.cover,
+              ),
             ),
-          ),
-          Padding(
-            padding: EdgeInsets.all(8.w),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: List.generate(5, (index) {
-                    return Icon(Icons.star, color: Colors.amber, size: 14.sp);
-                  }),
-                ),
-                SizedBox(height: 4.h),
-                Text(
-                  "BMW Tire Valve Stem Caps - Set of 4",
-                  style: TextStyle(
-                    fontSize: 12.sp,
-                    fontWeight: FontWeight.w500,
+            Padding(
+              padding: EdgeInsets.all(8.w),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: List.generate(5, (index) {
+                      return Icon(Icons.star, color: Colors.amber, size: 14.sp);
+                    }),
                   ),
-                  maxLines: 2,
-                ),
-                SizedBox(height: 4.h),
-                Text(
-                  "LKR 2,000.00",
-                  style: TextStyle(fontSize: 12.sp, color: Colors.black87),
-                ),
-                SizedBox(height: 4.h),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      "42 sold",
-                      style: TextStyle(fontSize: 10.sp, color: Colors.grey),
+                  SizedBox(height: 4.h),
+                  Text(
+                    "BMW Tire Valve Stem Caps - Set of 4",
+                    style: TextStyle(
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.w500,
                     ),
-                    Icon(Icons.shopping_cart, color: Colors.green, size: 16.sp),
-                  ],
-                ),
-              ],
+                    maxLines: 2,
+                  ),
+                  SizedBox(height: 4.h),
+                  Text(
+                    "LKR 2,000.00",
+                    style: TextStyle(fontSize: 12.sp, color: Colors.black87),
+                  ),
+                  SizedBox(height: 4.h),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "42 sold",
+                        style: TextStyle(fontSize: 10.sp, color: Colors.grey),
+                      ),
+                      Icon(Icons.shopping_cart,
+                          color: Colors.green, size: 16.sp),
+                    ],
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
