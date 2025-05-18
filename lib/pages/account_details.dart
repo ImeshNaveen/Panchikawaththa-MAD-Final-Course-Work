@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:panchikawaththa/pages/help_center_page.dart';
+import 'package:panchikawaththa/pages/login_page.dart';
+import 'package:panchikawaththa/pages/return_details_page.dart';
+import 'package:panchikawaththa/pages/save_card_page.dart';
+import 'package:panchikawaththa/pages/store_coupon_page.dart';
 
 class AccountDetails extends StatefulWidget {
   const AccountDetails({super.key});
@@ -7,6 +12,17 @@ class AccountDetails extends StatefulWidget {
 }
 
 class _AccountDetailsState extends State<AccountDetails> {
+  Widget _buildMenuItem(IconData icon, String label) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 32, color: Colors.black87),
+        const SizedBox(height: 8),
+        Text(label, style: const TextStyle(fontSize: 13)),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -26,7 +42,7 @@ class _AccountDetailsState extends State<AccountDetails> {
           children: [
             Container(
               decoration: BoxDecoration(
-                color: Colors.green,
+                color: const Color.fromARGB(255, 80, 192, 84),
                 borderRadius: BorderRadius.circular(12),
               ),
               padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
@@ -59,7 +75,13 @@ class _AccountDetailsState extends State<AccountDetails> {
                               Colors.white,
                             ),
                           ),
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => LoginPage()),
+                            );
+                          },
                           child: Text('Sign in/ Register'),
                         ),
                       ],
@@ -83,17 +105,6 @@ class _AccountDetailsState extends State<AccountDetails> {
               endIndent: 8,
               color: Colors.black12,
             ),
-            const SizedBox(height: 15),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: const [
-                _AccountOption(icon: Icons.headset_mic, label: 'Help Center'),
-                _AccountOption(icon: Icons.credit_card, label: 'Cards'),
-                _AccountOption(icon: Icons.keyboard_return, label: 'Return'),
-                _AccountOption(icon: Icons.discount, label: 'Coupons'),
-              ],
-            ),
-            const SizedBox(height: 14),
             Divider(
               height: 2,
               thickness: 1,
