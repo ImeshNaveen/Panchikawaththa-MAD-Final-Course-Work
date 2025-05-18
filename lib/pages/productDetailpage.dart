@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:panchikawaththa/pages/review.dart';
+import 'seller_page.dart';
 
 class ProductDetailPage extends StatelessWidget {
   ProductDetailPage({super.key});
@@ -87,21 +88,51 @@ class ProductDetailPage extends StatelessWidget {
             const SizedBox(height: 16),
 
             // Price & Title
-            const Text("LKR 24,900.00",
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
+
             const Text(
               "Power Drilled & Slotted Brake Pads for Chevy",
-              style: TextStyle(fontSize: 16),
+              style: TextStyle(
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             const SizedBox(height: 6),
             const Text(
-              "Free shipping",
-              style:
-                  TextStyle(color: primaryColor, fontWeight: FontWeight.bold),
+              "LKR 24,900.00",
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 12),
-
+            const SizedBox(height: 8),
+            const Text(
+              "Free shipping",
+              style: TextStyle(
+                color: primaryColor,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color.fromARGB(255, 0, 0, 0),
+                    ),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const SellerPage()),
+                      );
+                    },
+                    child: const Text(
+                      "Seller Details",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
             // Inline Rating Summary
             Row(
               children: const [
