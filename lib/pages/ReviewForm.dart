@@ -63,8 +63,15 @@ class _ReviewFormState extends State<ReviewForm> {
             ),
             SizedBox(height: 10),
             ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color(0xFF02B91A),
+              ),
               onPressed: _submitReview,
-              child: Text('SEND REVIEW'),
+              child: Text('SEND REVIEW',
+                  style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white)),
             ),
           ],
         ),
