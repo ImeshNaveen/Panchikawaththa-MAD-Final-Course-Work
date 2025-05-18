@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:panchikawaththa/pages/change_password_page.dart';
 
 class SettingPage extends StatelessWidget {
   const SettingPage({super.key});
@@ -21,10 +22,6 @@ class SettingPage extends StatelessWidget {
               title: 'Two-Factor Authentication',
               icon: Icons.shield_outlined,
               page: const TwoFactorPage()),
-          SettingsTile(
-              title: 'Login Activity',
-              icon: Icons.devices,
-              page: const LoginActivityPage()),
           SettingsTile(
               title: 'Logout', icon: Icons.logout, page: const LogoutPage()),
           const SectionHeader(title: 'Profile'),
@@ -53,10 +50,6 @@ class SettingPage extends StatelessWidget {
               title: 'Notifications',
               icon: Icons.notifications,
               page: const NotificationPage()),
-          SettingsTile(
-              title: 'Accessibility',
-              icon: Icons.accessibility,
-              page: const AccessibilityPage()),
           const SectionHeader(title: 'Support & Feedback'),
           SettingsTile(
               title: 'Help Center',
@@ -83,10 +76,6 @@ class SettingPage extends StatelessWidget {
               title: 'Terms & Conditions',
               icon: Icons.description,
               page: const TermsConditionsPage()),
-          SettingsTile(
-              title: 'App Version',
-              icon: Icons.info_outline,
-              page: const AppVersionPage()),
         ],
       ),
     );
@@ -133,26 +122,11 @@ class SettingsTile extends StatelessWidget {
   }
 }
 
-// Below are empty screen templates for each setting
-
-class ChangePasswordPage extends StatelessWidget {
-  const ChangePasswordPage({super.key});
-  @override
-  Widget build(BuildContext context) =>
-      _buildScreen(context, 'Change Password');
-}
-
 class TwoFactorPage extends StatelessWidget {
   const TwoFactorPage({super.key});
   @override
   Widget build(BuildContext context) =>
       _buildScreen(context, 'Two-Factor Authentication');
-}
-
-class LoginActivityPage extends StatelessWidget {
-  const LoginActivityPage({super.key});
-  @override
-  Widget build(BuildContext context) => _buildScreen(context, 'Login Activity');
 }
 
 class LogoutPage extends StatelessWidget {
@@ -199,12 +173,6 @@ class NotificationPage extends StatelessWidget {
   Widget build(BuildContext context) => _buildScreen(context, 'Notifications');
 }
 
-class AccessibilityPage extends StatelessWidget {
-  const AccessibilityPage({super.key});
-  @override
-  Widget build(BuildContext context) => _buildScreen(context, 'Accessibility');
-}
-
 class HelpCenter_Page extends StatelessWidget {
   const HelpCenter_Page({super.key});
   @override
@@ -241,12 +209,6 @@ class TermsConditionsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) =>
       _buildScreen(context, 'Terms & Conditions');
-}
-
-class AppVersionPage extends StatelessWidget {
-  const AppVersionPage({super.key});
-  @override
-  Widget build(BuildContext context) => _buildScreen(context, 'App Version');
 }
 
 Widget _buildScreen(BuildContext context, String title) {
