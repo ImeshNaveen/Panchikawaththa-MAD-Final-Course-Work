@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:panchikawaththa/pages/category.dart';
 import 'package:panchikawaththa/pages/notification.dart';
 import 'package:panchikawaththa/pages/productDetailpage.dart';
+import 'package:panchikawaththa/pages/review.dart'; // <-- Add this import
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -147,7 +148,7 @@ class HomePage extends StatelessWidget {
                 itemBuilder: (context, index) {
                   return dealCard(context);
                 },
-              ),
+              )
             ],
           ),
         ),
