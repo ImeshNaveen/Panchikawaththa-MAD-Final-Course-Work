@@ -59,23 +59,10 @@ class _MainLayoutState extends State<MainLayout> {
                 index: 3,
                 activeColor: Color(0xFF02B91A),
               ),
-              GestureDetector(
-                onTap: () => setState(() => _currentIndex = 4),
-                child: Container(
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: _currentIndex == 4
-                          ? Colors.greenAccent
-                          : Colors.transparent,
-                      width: 2,
-                    ),
-                  ),
-                  child: CircleAvatar(
-                    radius: 14.r,
-                    backgroundImage: AssetImage("assets/profile.jpeg"),
-                  ),
-                ),
+              navItem(
+                icon: Icons.account_circle, // <-- Account icon
+                index: 4,
+                activeColor: Color(0xFF02B91A),
               ),
             ],
           ),

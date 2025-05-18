@@ -74,7 +74,12 @@ class _UserProfileEditScreenState extends State<UserProfileEditScreen> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: const BackButton(color: Colors.black),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
         title: const Text("Edit User Profile",
             style: TextStyle(color: Colors.black)),
         actions: [
@@ -88,7 +93,6 @@ class _UserProfileEditScreenState extends State<UserProfileEditScreen> {
         child: Column(
           children: [
             const SizedBox(height: 16),
-            // Profile Card
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 16),
               padding: const EdgeInsets.all(20),
@@ -107,7 +111,6 @@ class _UserProfileEditScreenState extends State<UserProfileEditScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Profile Picture
                   Center(
                     child: Stack(
                       children: [
@@ -131,7 +134,6 @@ class _UserProfileEditScreenState extends State<UserProfileEditScreen> {
                           ),
                           child: const CircleAvatar(
                             backgroundImage: AssetImage("assets/profile.jpeg"),
-                            // Replace with your image asset when implementing
                           ),
                         ),
                         Positioned(
@@ -139,11 +141,10 @@ class _UserProfileEditScreenState extends State<UserProfileEditScreen> {
                           right: 0,
                           child: GestureDetector(
                             onTap: () {
-                              // Add image picker functionality here
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
-                                    content:
-                                        Text("Profile picture edit clicked")),
+                                  content: Text("Profile picture edit clicked"),
+                                ),
                               );
                             },
                             child: Container(
@@ -169,8 +170,6 @@ class _UserProfileEditScreenState extends State<UserProfileEditScreen> {
                     ),
                   ),
                   const SizedBox(height: 24),
-
-                  // Username Field
                   const Text(
                     "Username:",
                     style: TextStyle(
@@ -195,8 +194,6 @@ class _UserProfileEditScreenState extends State<UserProfileEditScreen> {
                     ),
                   ),
                   const SizedBox(height: 16),
-
-                  // Email Field
                   const Text(
                     "Email :",
                     style: TextStyle(
@@ -222,8 +219,6 @@ class _UserProfileEditScreenState extends State<UserProfileEditScreen> {
                     ),
                   ),
                   const SizedBox(height: 16),
-
-                  // Phone Number Field
                   const Text(
                     "Phone No :",
                     style: TextStyle(
@@ -249,8 +244,6 @@ class _UserProfileEditScreenState extends State<UserProfileEditScreen> {
                     ),
                   ),
                   const SizedBox(height: 24),
-
-                  // Save Button
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton.icon(
@@ -265,7 +258,6 @@ class _UserProfileEditScreenState extends State<UserProfileEditScreen> {
                         ),
                       ),
                       onPressed: () {
-                        // Validate inputs if needed
                         if (_usernameController.text.isEmpty ||
                             _emailController.text.isEmpty ||
                             _phoneController.text.isEmpty) {
@@ -276,10 +268,8 @@ class _UserProfileEditScreenState extends State<UserProfileEditScreen> {
                           return;
                         }
 
-                        // Show success dialog
                         _showSaveSuccessDialog();
 
-                        // Here you would typically call your API to save the data
                         print("Username: ${_usernameController.text}");
                         print("Email: ${_emailController.text}");
                         print("Phone: ${_phoneController.text}");
