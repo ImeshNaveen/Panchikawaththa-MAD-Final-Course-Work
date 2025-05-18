@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:panchikawaththa/pages/review.dart';
 
 class ProductDetailPage extends StatelessWidget {
   ProductDetailPage({super.key});
@@ -195,9 +196,6 @@ class RatingsAndReviews extends StatelessWidget {
         const SizedBox(height: 12),
         Center(
           child: ElevatedButton(
-            onPressed: () {
-              // TODO: Add navigation or modal for more reviews
-            },
             style: ElevatedButton.styleFrom(
               backgroundColor: primaryColor,
               shape: RoundedRectangleBorder(
@@ -208,6 +206,13 @@ class RatingsAndReviews extends StatelessWidget {
               'See More',
               style: TextStyle(color: Colors.white),
             ),
+            // Navigate to ReviewPage when pressed
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ReviewsPage()),
+              );
+            },
           ),
         ),
         const SizedBox(height: 12),

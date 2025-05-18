@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'ReviewForm.dart'; 
+import 'ReviewForm.dart';
 
 void main() {
   runApp(MaterialApp(home: ReviewsPage(), debugShowCheckedModeBanner: false));
@@ -65,7 +65,8 @@ class ReviewsPage extends StatelessWidget {
         Stack(
           children: [
             Container(width: maxWidth, height: 8, color: Colors.grey[300]),
-            Container(width: maxWidth * percent, height: 8, color: Colors.green),
+            Container(
+                width: maxWidth * percent, height: 8, color: Colors.green),
           ],
         ),
         SizedBox(width: 8),
@@ -83,13 +84,15 @@ class ReviewsPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Rating & Reviews", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+            Text("Rating & Reviews",
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
             SizedBox(height: 8),
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(averageRating.toStringAsFixed(1),
-                    style: TextStyle(fontSize: 48, fontWeight: FontWeight.bold)),
+                    style:
+                        TextStyle(fontSize: 48, fontWeight: FontWeight.bold)),
                 SizedBox(width: 8),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -118,7 +121,8 @@ class ReviewsPage extends StatelessWidget {
                         Row(
                           children: List.generate(
                             int.parse(review['stars']!),
-                            (_) => Icon(Icons.star, size: 16, color: Colors.orange),
+                            (_) => Icon(Icons.star,
+                                size: 16, color: Colors.orange),
                           ),
                         ),
                         SizedBox(height: 4),
@@ -134,8 +138,12 @@ class ReviewsPage extends StatelessWidget {
               padding: const EdgeInsets.all(12),
               child: ElevatedButton.icon(
                 onPressed: () => _showReviewPopup(context),
-                icon: Icon(Icons.edit),
-                label: Text('Write a review'),
+                icon: Icon(Icons.edit, color: Colors.white),
+                label: Text('Write a review',
+                    style: TextStyle(color: Colors.white)),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Color(0xFF02B91A),
+                ),
               ),
             )
           ],
