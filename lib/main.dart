@@ -3,15 +3,23 @@ import 'package:panchikawaththa/pages/Root.dart';
 import 'package:panchikawaththa/pages/SpashScreen.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'pages/main_layout.dart';
+import 'package:panchikawaththa/pages/profile_page.dart';
+import 'package:panchikawaththa/pages/edit_profile_page.dart';
 
 void main() => runApp(
       ScreenUtilInit(
-        designSize: Size(375, 812), // base design size (width x height)
+        designSize: const Size(375, 812),
         minTextAdapt: true,
         builder: (context, child) {
           return MaterialApp(
             debugShowCheckedModeBanner: false,
-            home: SplashScreen(),
+            initialRoute: '/splash',
+            routes: {
+              '/splash': (context) => const SplashScreen(),
+              '/home_page': (context) => const MainLayout(),
+              // '/profile': (context) => const Profilepage(),
+              // '/edit_profile': (context) => const UserProfileEditScreen(),
+            },
           );
         },
       ),

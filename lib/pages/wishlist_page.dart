@@ -49,7 +49,6 @@ class WishlistPage extends StatelessWidget {
             SizedBox(height: 40.h),
             Row(
               children: [
-                Icon(Icons.arrow_back),
                 SizedBox(width: 10.w),
                 Text('My Wishlist',
                     style: TextStyle(

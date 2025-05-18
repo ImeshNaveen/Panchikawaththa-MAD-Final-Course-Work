@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'home_page.dart';
 import 'cart_page.dart';
-import 'notification.dart';
+import 'search.dart';
 import 'wishlist_page.dart';
 import 'profile_page.dart';
 
@@ -19,9 +19,9 @@ class _MainLayoutState extends State<MainLayout> {
   final List<Widget> _pages = [
     HomePage(),
     CartPage(),
-    NotificationsPage(),
+    SearchPage(),
     WishlistPage(),
-    ProfilePage(),
+    Profilepage(),
   ];
 
   @override
@@ -42,17 +42,27 @@ class _MainLayoutState extends State<MainLayout> {
               navItem(
                 icon: Icons.home,
                 index: 0,
-                activeColor: Colors.greenAccent,
+                activeColor: Color(0xFF02B91A),
               ),
-              navItem(icon: Icons.shopping_cart_outlined, index: 1),
-              navItem(icon: Icons.search, index: 2),
-              navItem(icon: Icons.favorite_border, index: 3),
-              GestureDetector(
-                onTap: () => setState(() => _currentIndex = 4),
-                child: CircleAvatar(
-                  radius: 14.r,
-                  backgroundImage: AssetImage("assets/profile.jpeg"),
-                ),
+              navItem(
+                icon: Icons.shopping_cart_outlined,
+                index: 1,
+                activeColor: Color(0xFF02B91A),
+              ),
+              navItem(
+                icon: Icons.search,
+                index: 2,
+                activeColor: Color(0xFF02B91A),
+              ),
+              navItem(
+                icon: Icons.favorite_border,
+                index: 3,
+                activeColor: Color(0xFF02B91A),
+              ),
+              navItem(
+                icon: Icons.account_circle, // <-- Account icon
+                index: 4,
+                activeColor: Color(0xFF02B91A),
               ),
             ],
           ),

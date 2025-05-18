@@ -1,180 +1,632 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:panchikawaththa/pages/add_new_card_page.dart';
+import 'package:panchikawaththa/pages/edit_profile_page.dart';
+import 'package:panchikawaththa/pages/help_center_page.dart';
+import 'package:panchikawaththa/pages/return_details_page.dart';
+import 'package:panchikawaththa/pages/save_card_page.dart';
+import 'package:panchikawaththa/pages/store_coupon_page.dart';
+import 'setting_page.dart';
+import 'notification.dart';
 
-class ProfilePage extends StatelessWidget {
-  const ProfilePage({super.key});
+void main() {
+  runApp(const Profilepage());
+}
+
+class Profilepage extends StatelessWidget {
+  const Profilepage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        primarySwatch: Colors.green,
+        scaffoldBackgroundColor: Colors.white,
+      ),
+      home: const AccountPage(),
+    );
+  }
+}
+
+class AccountPage extends StatelessWidget {
+  const AccountPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       body: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Top Bar
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        child: Column(
+          children: [
+            // App Bar
+            Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+              child: Row(
+                children: [
+                  const SizedBox(width: 8),
+                  const Text(
+                    'Account',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                  const Spacer(),
+                  GestureDetector(
+                    onTap: () {
+                      // Navigate to settings page
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const SettingPage()),
+                      );
+                    },
+                    child: const Icon(Icons.settings),
+                  ),
+                  const SizedBox(width: 16),
+                  GestureDetector(
+                    onTap: () {
+                      // Navigate to settings page
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => NotificationsPage()),
+                      );
+                    },
+                    child: const Icon(Icons.notifications_none),
+                  ),
+                ],
+              ),
+            ),
+
+            // Profile Card
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Container(
+                padding: const EdgeInsets.all(16.0),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.1),
+                      spreadRadius: 1,
+                      blurRadius: 5,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: Row(
                   children: [
-                    Icon(Icons.arrow_back),
-                    Text("Account",
-                        style: TextStyle(
-                            fontSize: 18.sp, fontWeight: FontWeight.bold)),
-                    Row(
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: const [
+                          Text(
+                            'John Snow',
+                            style: TextStyle(
+                                fontSize: 24, fontWeight: FontWeight.bold),
+                          ),
+                          SizedBox(height: 8),
+                          Row(
+                            children: [
+                              Icon(Icons.email, size: 16, color: Colors.grey),
+                              SizedBox(width: 8),
+                              Text(
+                                'johnsnow@gmail.com',
+                                style: TextStyle(color: Colors.grey),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 4),
+                          Row(
+                            children: [
+                              Icon(Icons.phone, size: 16, color: Colors.grey),
+                              SizedBox(width: 8),
+                              Text(
+                                '+94 76 942 3847',
+                                style: TextStyle(color: Colors.grey),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    Column(
                       children: [
-                        Icon(Icons.settings),
-                        SizedBox(width: 10.w),
-                        Icon(Icons.notifications_none),
+                        CircleAvatar(
+                          radius: 30,
+                          backgroundImage: AssetImage("assets/profile.jpeg"),
+                        ),
+                        const SizedBox(height: 8),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => EditProfilePage(),
+                              ),
+                            );
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: Colors.green,
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Row(
+                              children: const [
+                                Text(
+                                  'Edit Profile',
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 12),
+                                ),
+                                Icon(Icons.arrow_forward_ios,
+                                    size: 12, color: Colors.white),
+                              ],
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ],
                 ),
-                SizedBox(height: 20.h),
-
-                // User Info
-                Container(
-                  padding: EdgeInsets.all(16.w),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[100],
-                    borderRadius: BorderRadius.circular(12.r),
-                  ),
-                  child: Row(
-                    children: [
-                      CircleAvatar(
-                        radius: 30.r,
-                        backgroundImage: AssetImage("assets/profile.jpeg"),
-                      ),
-                      SizedBox(width: 12.w),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text("John Snow",
-                                style: TextStyle(
-                                    fontSize: 16.sp,
-                                    fontWeight: FontWeight.bold)),
-                            Text("johnsnow@gmail.com",
-                                style: TextStyle(fontSize: 12.sp)),
-                            Text("+94 76 942 3847",
-                                style: TextStyle(fontSize: 12.sp)),
-                          ],
-                        ),
-                      ),
-                      ElevatedButton(
-                        onPressed: () {},
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Color(0xFF02B91A),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20.r)),
-                          padding: EdgeInsets.symmetric(horizontal: 16.w),
-                        ),
-                        child: Text("Edit Profile",
-                            style: TextStyle(fontSize: 12.sp)),
-                      ),
-                    ],
-                  ),
-                ),
-
-                SizedBox(height: 20.h),
-
-                // Services Row
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    _serviceItem(Icons.help_outline, "Help Center"),
-                    _serviceItem(Icons.credit_card, "Cards"),
-                    _serviceItem(Icons.undo, "Return"),
-                    _serviceItem(Icons.card_giftcard, "Coupons"),
-                  ],
-                ),
-                SizedBox(height: 20.h),
-
-                // Recent Purchases
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text("Recent Purchases",
-                        style: TextStyle(
-                            fontSize: 16.sp, fontWeight: FontWeight.bold)),
-                    Text("Show all",
-                        style: TextStyle(color: Colors.blue, fontSize: 12.sp)),
-                  ],
-                ),
-                SizedBox(height: 12.h),
-
-                _purchaseItem("Item Name", 5, 75000, 375000),
-                _purchaseItem("Exide Battery", 1, 45000, 45000),
-                _purchaseItem("Turbo Unit", 1, 75000, 75000),
-              ],
+              ),
             ),
-          ),
+
+            // Menu Icons
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => HelpCenterPage()),
+                      );
+                    },
+                    child: _buildMenuItem(Icons.headset, 'Help Center'),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => SavedCardsPage()),
+                      );
+                    },
+                    child: _buildMenuItem(Icons.credit_card, 'Cards'),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => ReturnDetailsPage()),
+                      );
+                    },
+                    child: _buildMenuItem(Icons.keyboard_return, 'Return'),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => StoreCouponPage()),
+                      );
+                    },
+                    child: _buildMenuItem(Icons.card_giftcard, 'Coupons'),
+                  ),
+                ],
+              ),
+            ),
+
+            const Divider(height: 32),
+
+            // Recent Purchases Header
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Recent Purchases',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const RecentPurchasesPage()),
+                      );
+                    },
+                    child: const Text(
+                      'Show all',
+                      style: TextStyle(
+                        color: Colors.blue,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 16),
+
+            // Recent Purchases List
+            Expanded(
+              child: ListView(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                children: [
+                  _buildPurchaseItem(
+                    'Item Name',
+                    '375,000.00',
+                    '5',
+                    '75,000.00',
+                    'assets/wheels.png',
+                    isDelivered: false,
+                  ),
+                  _buildPurchaseItem(
+                    'Exide Battery',
+                    '45,000.00',
+                    '1',
+                    '45,000.00',
+                    'assets/battery.png',
+                  ),
+                  _buildPurchaseItem(
+                    'Turbo unit',
+                    '75,000.00',
+                    '1',
+                    '75,000.00',
+                    'assets/turbo.png',
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _serviceItem(IconData icon, String label) {
+  Widget _buildMenuItem(IconData icon, String label) {
     return Column(
       children: [
-        Icon(icon, size: 30.sp),
-        SizedBox(height: 4.h),
-        Text(label, style: TextStyle(fontSize: 12.sp)),
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: Colors.grey.withOpacity(0.1),
+            shape: BoxShape.circle,
+          ),
+          child: Icon(icon, color: Colors.black),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          label,
+          style: const TextStyle(fontSize: 12),
+        ),
       ],
     );
   }
 
-  Widget _purchaseItem(String name, int qty, double price, double total) {
+  Widget _buildPurchaseItem(String name, String price, String quantity,
+      String unitPrice, String imagePath,
+      {bool isDelivered = true}) {
     return Container(
-      margin: EdgeInsets.only(bottom: 12.h),
-      padding: EdgeInsets.all(12.w),
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.grey[100],
-        borderRadius: BorderRadius.circular(12.r),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            spreadRadius: 1,
+            blurRadius: 5,
+            offset: const Offset(0, 3),
+          ),
+        ],
       ),
       child: Row(
         children: [
-          Image.asset("assets/product.png",
-              height: 60.h, width: 60.w, fit: BoxFit.cover),
-          SizedBox(width: 12.w),
+          Container(
+            width: 60,
+            height: 60,
+            decoration: BoxDecoration(
+              color: Colors.grey.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: const Icon(Icons.image, size: 30, color: Colors.grey),
+          ),
+          const SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(name,
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 14.sp)),
-                Text("Qty: $qty", style: TextStyle(fontSize: 12.sp)),
-                Text("LKR ${price.toStringAsFixed(2)}",
-                    style: TextStyle(fontSize: 12.sp)),
-                Text("Delivery in 15th OCT",
-                    style: TextStyle(fontSize: 12.sp, color: Colors.grey)),
+                Text(
+                  name,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Qty: $quantity',
+                  style: TextStyle(color: Colors.grey[700], fontSize: 14),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'LKR $unitPrice',
+                  style: TextStyle(color: Colors.grey[700], fontSize: 14),
+                ),
               ],
             ),
           ),
           Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Text("LKR ${total.toStringAsFixed(2)}",
-                  style:
-                      TextStyle(fontWeight: FontWeight.bold, fontSize: 12.sp)),
-              SizedBox(height: 6.h),
-              ElevatedButton(
-                onPressed: () {},
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.black,
-                  minimumSize: Size(90.w, 26.h),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16.r)),
-                  padding: EdgeInsets.zero,
+              Text(
+                'LKR $price',
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
                 ),
-                child: Text("Track Order", style: TextStyle(fontSize: 10.sp)),
               ),
+              const SizedBox(height: 8),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                decoration: BoxDecoration(
+                  color: Colors.grey.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: const Text(
+                  'Track Order',
+                  style: TextStyle(fontSize: 12),
+                ),
+              ),
+              const SizedBox(height: 4),
+              if (isDelivered)
+                Text(
+                  'Delivery in 15th OCT',
+                  style: TextStyle(fontSize: 12, color: Colors.grey[700]),
+                ),
             ],
           ),
         ],
       ),
     );
+  }
+}
+
+class RecentPurchasesPage extends StatelessWidget {
+  const RecentPurchasesPage({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: SafeArea(
+        child: Column(
+          children: [
+            // App bar
+            Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+              child: Row(
+                children: [
+                  GestureDetector(
+                    onTap: () => Navigator.pop(context),
+                    child: const Icon(Icons.arrow_back_ios, size: 20),
+                  ),
+                  const SizedBox(width: 8),
+                  const Text(
+                    'Recent Purchases',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                  const Spacer(),
+                  const Icon(Icons.notifications_none),
+                ],
+              ),
+            ),
+
+            const Divider(),
+
+            // Purchases List
+            Expanded(
+              child: ListView(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                children: [
+                  _buildPurchaseItem(
+                    'Turbo unit',
+                    '75,000.00',
+                    '1',
+                    '75,000.00',
+                    isDelivered: false,
+                  ),
+                  _buildPurchaseItem(
+                    'Item Name',
+                    '375,000.00',
+                    '5',
+                    '75,000.00',
+                    isDelivered: false,
+                  ),
+                  _buildPurchaseItem(
+                    'Exide Battery',
+                    '45,000.00',
+                    '1',
+                    '45,000.00',
+                  ),
+                  _buildPurchaseItem(
+                    'Turbo unit',
+                    '75,000.00',
+                    '1',
+                    '75,000.00',
+                  ),
+                  _buildPurchaseItem(
+                    'Head Light',
+                    '150,000.00',
+                    '2',
+                    '75,000.00',
+                  ),
+                  _buildPurchaseItem(
+                    'Diesel Filter',
+                    '15,000.00',
+                    '1',
+                    '15,000.00',
+                  ),
+                  _buildPurchaseItem(
+                    'Turbo unit',
+                    '75,000.00',
+                    '1',
+                    '75,000.00',
+                    isDelivered: false,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPurchaseItem(
+      String name, String price, String quantity, String unitPrice,
+      {bool isDelivered = true}) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade200,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Stack(
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 60,
+                height: 60,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Center(
+                  child: _getItemIcon(name),
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      name,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Qty: $quantity',
+                      style:
+                          const TextStyle(color: Colors.black87, fontSize: 14),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'LKR $unitPrice',
+                      style:
+                          const TextStyle(color: Colors.black87, fontSize: 14),
+                    ),
+                  ],
+                ),
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    'LKR $price',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade400,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: const Text(
+                      'Post review',
+                      style: TextStyle(fontSize: 12, color: Colors.black87),
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  if (isDelivered)
+                    const Text(
+                      'Delivery in 9th OCT',
+                      style: TextStyle(fontSize: 12, color: Colors.black87),
+                    ),
+                ],
+              ),
+            ],
+          ),
+          if (!isDelivered)
+            Positioned(
+              right: -20,
+              top: 10,
+              child: Transform.rotate(
+                angle: 0.785398, // 45 degrees in radians
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 30, vertical: 5),
+                  color: Colors.red,
+                  child: const Text(
+                    'DELIVERED',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _getItemIcon(String name) {
+    IconData iconData;
+
+    switch (name.toLowerCase()) {
+      case 'turbo unit':
+        iconData = Icons.settings;
+        break;
+      case 'exide battery':
+        iconData = Icons.battery_full;
+        break;
+      case 'head light':
+        iconData = Icons.lightbulb;
+        break;
+      case 'diesel filter':
+        iconData = Icons.filter_alt;
+        break;
+      default:
+        iconData = Icons.circle;
+        break;
+    }
+
+    return Icon(iconData, size: 30, color: Colors.grey);
   }
 }
