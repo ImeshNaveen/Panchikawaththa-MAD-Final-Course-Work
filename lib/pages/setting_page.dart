@@ -1,5 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:panchikawaththa/pages/ManageAddressPage.dart';
+import 'package:panchikawaththa/pages/TwoFactorPage.dart';
 import 'package:panchikawaththa/pages/change_password_page.dart';
+import 'package:panchikawaththa/pages/contactUs.dart';
+import 'package:panchikawaththa/pages/edit_profile_page.dart';
+import 'package:panchikawaththa/pages/help_center_page.dart';
+import 'package:panchikawaththa/pages/languageSettings.dart';
+import 'package:panchikawaththa/pages/leaveFeadback.dart';
+import 'package:panchikawaththa/pages/logout.dart';
+import 'package:panchikawaththa/pages/notificationSetting.dart';
+import 'package:panchikawaththa/pages/paymentMethodSetting.dart';
+import 'package:panchikawaththa/pages/privacy.dart';
+import 'package:panchikawaththa/pages/reportProblem.dart';
+import 'package:panchikawaththa/pages/tearms_conditions.dart';
 
 class SettingPage extends StatelessWidget {
   const SettingPage({super.key});
@@ -28,7 +41,7 @@ class SettingPage extends StatelessWidget {
           SettingsTile(
               title: 'Edit Profile',
               icon: Icons.person,
-              page: const EditProfile_Page()),
+              page: const EditProfilePage()),
           SettingsTile(
               title: 'Manage Address',
               icon: Icons.location_on,
@@ -49,12 +62,12 @@ class SettingPage extends StatelessWidget {
           SettingsTile(
               title: 'Notifications',
               icon: Icons.notifications,
-              page: const NotificationPage()),
+              page: const NotificationsettingPage()),
           const SectionHeader(title: 'Support & Feedback'),
           SettingsTile(
               title: 'Help Center',
               icon: Icons.help_outline,
-              page: const HelpCenter_Page()),
+              page: const HelpCenterPage()),
           SettingsTile(
               title: 'Contact Us',
               icon: Icons.mail_outline,
@@ -122,45 +135,6 @@ class SettingsTile extends StatelessWidget {
   }
 }
 
-class TwoFactorPage extends StatelessWidget {
-  const TwoFactorPage({super.key});
-  @override
-  Widget build(BuildContext context) =>
-      _buildScreen(context, 'Two-Factor Authentication');
-}
-
-class LogoutPage extends StatelessWidget {
-  const LogoutPage({super.key});
-  @override
-  Widget build(BuildContext context) => _buildScreen(context, 'Logout');
-}
-
-class EditProfile_Page extends StatelessWidget {
-  const EditProfile_Page({super.key});
-  @override
-  Widget build(BuildContext context) => _buildScreen(context, 'Edit Profile');
-}
-
-class ManageAddressPage extends StatelessWidget {
-  const ManageAddressPage({super.key});
-  @override
-  Widget build(BuildContext context) => _buildScreen(context, 'Manage Address');
-}
-
-class PaymentMethodsPage extends StatelessWidget {
-  const PaymentMethodsPage({super.key});
-  @override
-  Widget build(BuildContext context) =>
-      _buildScreen(context, 'Payment Methods');
-}
-
-class LanguageSettingsPage extends StatelessWidget {
-  const LanguageSettingsPage({super.key});
-  @override
-  Widget build(BuildContext context) =>
-      _buildScreen(context, 'Language Settings');
-}
-
 class ThemeModePage extends StatelessWidget {
   const ThemeModePage({super.key});
   @override
@@ -171,44 +145,6 @@ class NotificationPage extends StatelessWidget {
   const NotificationPage({super.key});
   @override
   Widget build(BuildContext context) => _buildScreen(context, 'Notifications');
-}
-
-class HelpCenter_Page extends StatelessWidget {
-  const HelpCenter_Page({super.key});
-  @override
-  Widget build(BuildContext context) => _buildScreen(context, 'Help Center');
-}
-
-class ContactUsPage extends StatelessWidget {
-  const ContactUsPage({super.key});
-  @override
-  Widget build(BuildContext context) => _buildScreen(context, 'Contact Us');
-}
-
-class ReportProblemPage extends StatelessWidget {
-  const ReportProblemPage({super.key});
-  @override
-  Widget build(BuildContext context) =>
-      _buildScreen(context, 'Report a Problem');
-}
-
-class LeaveFeedbackPage extends StatelessWidget {
-  const LeaveFeedbackPage({super.key});
-  @override
-  Widget build(BuildContext context) => _buildScreen(context, 'Leave Feedback');
-}
-
-class PrivacyPolicyPage extends StatelessWidget {
-  const PrivacyPolicyPage({super.key});
-  @override
-  Widget build(BuildContext context) => _buildScreen(context, 'Privacy Policy');
-}
-
-class TermsConditionsPage extends StatelessWidget {
-  const TermsConditionsPage({super.key});
-  @override
-  Widget build(BuildContext context) =>
-      _buildScreen(context, 'Terms & Conditions');
 }
 
 Widget _buildScreen(BuildContext context, String title) {
