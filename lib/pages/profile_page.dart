@@ -1,4 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:panchikawaththa/pages/add_new_card_page.dart';
+import 'package:panchikawaththa/pages/edit_profile_page.dart';
+import 'package:panchikawaththa/pages/help_center_page.dart';
+import 'package:panchikawaththa/pages/return_details_page.dart';
+import 'package:panchikawaththa/pages/save_card_page.dart';
+import 'package:panchikawaththa/pages/store_coupon_page.dart';
+import 'setting_page.dart';
+import 'notification.dart';
 
 void main() {
   runApp(const Profilepage());
@@ -35,16 +43,35 @@ class AccountPage extends StatelessWidget {
                   const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
               child: Row(
                 children: [
-                  const Icon(Icons.arrow_back_ios, size: 20),
                   const SizedBox(width: 8),
                   const Text(
                     'Account',
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   const Spacer(),
-                  const Icon(Icons.settings),
+                  GestureDetector(
+                    onTap: () {
+                      // Navigate to settings page
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const SettingPage()),
+                      );
+                    },
+                    child: const Icon(Icons.settings),
+                  ),
                   const SizedBox(width: 16),
-                  const Icon(Icons.notifications_none),
+                  GestureDetector(
+                    onTap: () {
+                      // Navigate to settings page
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => NotificationsPage()),
+                      );
+                    },
+                    child: const Icon(Icons.notifications_none),
+                  ),
                 ],
               ),
             ),
@@ -109,23 +136,33 @@ class AccountPage extends StatelessWidget {
                           backgroundImage: AssetImage("assets/profile.jpeg"),
                         ),
                         const SizedBox(height: 8),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 6),
-                          decoration: BoxDecoration(
-                            color: Colors.green,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Row(
-                            children: const [
-                              Text(
-                                'Edit Profile',
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 12),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => EditProfilePage(),
                               ),
-                              Icon(Icons.arrow_forward_ios,
-                                  size: 12, color: Colors.white),
-                            ],
+                            );
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: Colors.green,
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Row(
+                              children: const [
+                                Text(
+                                  'Edit Profile',
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 12),
+                                ),
+                                Icon(Icons.arrow_forward_ios,
+                                    size: 12, color: Colors.white),
+                              ],
+                            ),
                           ),
                         ),
                       ],
@@ -141,10 +178,46 @@ class AccountPage extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  _buildMenuItem(Icons.headset, 'Help Center'),
-                  _buildMenuItem(Icons.credit_card, 'Cards'),
-                  _buildMenuItem(Icons.keyboard_return, 'Return'),
-                  _buildMenuItem(Icons.card_giftcard, 'Coupons'),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => HelpCenterPage()),
+                      );
+                    },
+                    child: _buildMenuItem(Icons.headset, 'Help Center'),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => SavedCardsPage()),
+                      );
+                    },
+                    child: _buildMenuItem(Icons.credit_card, 'Cards'),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => ReturnDetailsPage()),
+                      );
+                    },
+                    child: _buildMenuItem(Icons.keyboard_return, 'Return'),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => StoreCouponPage()),
+                      );
+                    },
+                    child: _buildMenuItem(Icons.card_giftcard, 'Coupons'),
+                  ),
                 ],
               ),
             ),
@@ -216,9 +289,6 @@ class AccountPage extends StatelessWidget {
                 ],
               ),
             ),
-
-            // Bottom Navigation Bar
-            _buildBottomNavigationBar(),
           ],
         ),
       ),
@@ -333,37 +403,6 @@ class AccountPage extends StatelessWidget {
       ),
     );
   }
-
-  Widget _buildBottomNavigationBar() {
-    return Container(
-      height: 70,
-      margin: const EdgeInsets.all(16),
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      decoration: BoxDecoration(
-        color: Colors.black,
-        borderRadius: BorderRadius.circular(40),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          const Icon(Icons.home, color: Colors.white),
-          const Icon(Icons.shopping_cart, color: Colors.white),
-          const Icon(Icons.search, color: Colors.white),
-          const Icon(Icons.favorite_border, color: Colors.white),
-          Container(
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.green, width: 2),
-              shape: BoxShape.circle,
-            ),
-            child: const CircleAvatar(
-              radius: 14,
-              backgroundImage: NetworkImage('https://via.placeholder.com/30'),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }
 
 class RecentPurchasesPage extends StatelessWidget {
@@ -451,9 +490,6 @@ class RecentPurchasesPage extends StatelessWidget {
                 ],
               ),
             ),
-
-            // Bottom Navigation Bar
-            _buildBottomNavigationBar(),
           ],
         ),
       ),
@@ -592,36 +628,5 @@ class RecentPurchasesPage extends StatelessWidget {
     }
 
     return Icon(iconData, size: 30, color: Colors.grey);
-  }
-
-  Widget _buildBottomNavigationBar() {
-    return Container(
-      height: 70,
-      margin: const EdgeInsets.all(16),
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      decoration: BoxDecoration(
-        color: Colors.black,
-        borderRadius: BorderRadius.circular(40),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          const Icon(Icons.home, color: Colors.white),
-          const Icon(Icons.shopping_cart, color: Colors.white),
-          const Icon(Icons.search, color: Colors.white),
-          const Icon(Icons.favorite_border, color: Colors.white),
-          Container(
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.green, width: 2),
-              shape: BoxShape.circle,
-            ),
-            child: const CircleAvatar(
-              radius: 14,
-              backgroundImage: NetworkImage('https://via.placeholder.com/30'),
-            ),
-          ),
-        ],
-      ),
-    );
   }
 }

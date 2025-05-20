@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:panchikawaththa/pages/profile_page.dart';
 import 'login_page.dart';
 import 'sign_up.dart';
 import 'home_Page.dart';
@@ -14,6 +15,7 @@ import 'setting_page.dart';
 import 'help_center_page.dart';
 import 'store_coupon_page.dart';
 import 'return_details_page.dart';
+import 'productDetailpage.dart';
 
 class RootPage extends StatelessWidget {
   const RootPage({super.key});
@@ -393,6 +395,32 @@ class RootPage extends StatelessWidget {
                         );
                       },
                       child: Text('search Page'),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: TextButton(
+                      style: TextButton.styleFrom(
+                        foregroundColor: Colors.white,
+                        backgroundColor: Colors.transparent,
+                        padding: EdgeInsets.all(16.0),
+                        textStyle: TextStyle(fontSize: 16),
+                        side: BorderSide(color: Colors.white),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                      ),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => ProductDetailPage()),
+                        );
+                      },
+                      child: Text('productDetail Page'),
                     ),
                   ),
                 ),
