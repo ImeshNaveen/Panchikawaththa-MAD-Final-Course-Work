@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:panchikawaththa/pages/profile_page.dart';
 import 'login_page.dart';
 import 'sign_up.dart';
 import 'home_Page.dart';
