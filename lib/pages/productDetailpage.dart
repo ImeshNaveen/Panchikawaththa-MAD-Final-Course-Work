@@ -12,6 +12,17 @@ class ProductDetailPage extends StatelessWidget {
   ];
   static const Color primaryColor = Color.fromARGB(255, 20, 211, 3);
 
+  void _addToCart(BuildContext context) {
+    // You can replace this with your cart logic
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Item added to cart!'),
+        duration: Duration(seconds: 2),
+        backgroundColor: Colors.black,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -36,7 +47,7 @@ class ProductDetailPage extends StatelessWidget {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.black,
                 ),
-                onPressed: () {},
+                onPressed: () => _addToCart(context),
                 child: const Text(
                   "Add to Cart",
                   style: TextStyle(color: Colors.white),
@@ -49,7 +60,9 @@ class ProductDetailPage extends StatelessWidget {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: primaryColor,
                 ),
-                onPressed: () {},
+                onPressed: () {
+                  // Add your "Buy Now" logic here
+                },
                 child: const Text(
                   "Buy Now",
                   style: TextStyle(color: Colors.white),
@@ -64,7 +77,6 @@ class ProductDetailPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Horizontal Scrollable Images
             SizedBox(
               height: 320,
               child: ListView.builder(
@@ -86,9 +98,6 @@ class ProductDetailPage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
-
-            // Price & Title
-
             const Text(
               "Power Drilled & Slotted Brake Pads for Chevy",
               style: TextStyle(
@@ -133,7 +142,6 @@ class ProductDetailPage extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 10),
-            // Inline Rating Summary
             Row(
               children: const [
                 Icon(Icons.star, color: Colors.orange, size: 20),
@@ -148,15 +156,9 @@ class ProductDetailPage extends StatelessWidget {
                 Text("(329 ratings)"),
               ],
             ),
-
             const Divider(height: 30),
-
-            // Ratings & Reviews Section (Moved before product details)
             const RatingsAndReviews(),
-
             const Divider(height: 30),
-
-            // Product Details
             const Text("Product details",
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
@@ -237,7 +239,6 @@ class RatingsAndReviews extends StatelessWidget {
               'See More',
               style: TextStyle(color: Colors.white),
             ),
-            // Navigate to ReviewPage when pressed
             onPressed: () {
               Navigator.push(
                 context,
@@ -262,7 +263,7 @@ class RatingsAndReviews extends StatelessWidget {
         SizedBox(
           width: 100,
           child: LinearProgressIndicator(
-            value: count / 12, // Adjust based on real max
+            value: count / 12,
             color: Colors.green,
             backgroundColor: Colors.grey.shade300,
             minHeight: 8,
