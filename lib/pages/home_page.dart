@@ -39,25 +39,19 @@ class _HomePageState extends State<HomePage>
                 children: [
                   SizedBox(height: 10.h),
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Image.asset(
                         "assets/logo.png",
-                        height: 35.h,
-                      ),
-                      SizedBox(width: 10.w),
-                      Expanded(
-                        child: Text(
-                          textAlign: TextAlign.center,
-                          'Welcome To Digital Panchikawaththa',
-                          style: TextStyle(fontSize: 12.sp),
-                        ),
+                        height: 50.h,
                       ),
                       GestureDetector(
                         onTap: () {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => NotificationsPage()),
+                              builder: (context) => NotificationsPage(),
+                            ),
                           );
                         },
                         child: Icon(Icons.notifications_none, size: 26.sp),
