@@ -1,74 +1,102 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:panchikawaththa/pages/profile_page.dart';
 import 'package:panchikawaththa/pages/sign_up.dart';
 
-class LoginPage extends StatelessWidget {
+class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
-
-  // Define the color as a variable
   static const Color primaryColor = Color.fromARGB(255, 20, 211, 3);
 
   @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  bool _isLoading = false;
+  final _auth = FirebaseAuth.instance;
+
+  void _login() async {
+    setState(() => _isLoading = true);
+    try {
+      await _auth.signInWithEmailAndPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Login Successful')),
+      );
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => Profilepage()),
+      ); // Navigate to home or dashboard here
+    } on FirebaseAuthException catch (e) {
+      String message = 'Login failed';
+      if (e.code == 'user-not-found')
+        message = 'User not found';
+      else if (e.code == 'wrong-password') message = 'Wrong password';
+
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(message)));
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    const primaryColor = LoginPage.primaryColor;
     return Scaffold(
       body: SafeArea(
         child: Container(
           width: double.infinity,
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topCenter,
-              colors: [
-                primaryColor, // Use the variable here
-                primaryColor, // Use the variable here
-              ],
+              colors: [primaryColor, primaryColor],
             ),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(height: 40),
-              Padding(
+              const SizedBox(height: 40),
+              const Padding(
                 padding: EdgeInsets.all(20),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'Login',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 40,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'Poppins',
-                      ),
-                    ),
+                    Text('Login',
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 40,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'Poppins')),
                     SizedBox(height: 10),
-                    Text(
-                      'Welcome Back',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'Poppins',
-                      ),
-                    ),
+                    Text('Welcome Back',
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'Poppins')),
                   ],
                 ),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               Expanded(
                 child: Container(
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(60),
-                      topRight: Radius.circular(60),
-                    ),
+                        topLeft: Radius.circular(60),
+                        topRight: Radius.circular(60)),
                   ),
                   child: Padding(
-                    padding: EdgeInsets.all(30),
+                    padding: const EdgeInsets.all(30),
                     child: Column(
                       children: [
-                        SizedBox(height: 60),
+                        const SizedBox(height: 60),
                         Column(
                           children: [
                             Container(
@@ -77,163 +105,112 @@ class LoginPage extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(30),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.green[200]!,
-                                    blurRadius: 20,
-                                    offset: Offset(0, 10),
-                                  ),
+                                      color: Colors.green[200]!,
+                                      blurRadius: 20,
+                                      offset: const Offset(0, 10)),
                                 ],
                               ),
-                              child: Column(
-                                children: [
-                                  Container(
-                                    padding: EdgeInsets.all(8),
-                                    child: TextField(
-                                      decoration: InputDecoration(
-                                        hintText: "Email or Phone number",
-                                        hintStyle:
-                                            TextStyle(color: Colors.grey),
-                                        border: InputBorder.none,
-                                        contentPadding:
-                                            EdgeInsets.only(left: 10),
-                                      ),
-                                    ),
-                                  ),
-                                ],
+                              child: TextField(
+                                controller: _emailController,
+                                keyboardType: TextInputType.emailAddress,
+                                decoration: const InputDecoration(
+                                  hintText: "Email",
+                                  border: InputBorder.none,
+                                  contentPadding: EdgeInsets.only(left: 10),
+                                ),
                               ),
                             ),
-                            SizedBox(height: 35), // Space between fields
+                            const SizedBox(height: 35),
                             Container(
                               decoration: BoxDecoration(
                                 color: Colors.white,
                                 borderRadius: BorderRadius.circular(30),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.green[200]!,
-                                    blurRadius: 20,
-                                    offset: Offset(0, 10),
-                                  ),
+                                      color: Colors.green[200]!,
+                                      blurRadius: 20,
+                                      offset: const Offset(0, 10)),
                                 ],
                               ),
-                              child: Column(
-                                children: [Container(child: PasswordField())],
+                              child: TextField(
+                                controller: _passwordController,
+                                obscureText: true,
+                                decoration: const InputDecoration(
+                                  hintText: "Password",
+                                  border: InputBorder.none,
+                                  contentPadding: EdgeInsets.only(left: 10),
+                                ),
                               ),
                             ),
                           ],
                         ),
-                        SizedBox(height: 20),
-                        Text(
-                          "Forgot Password?",
-                          style: TextStyle(color: Colors.grey),
-                        ),
-                        SizedBox(height: 40),
-                        Container(
-                          height: 50,
-                          margin: EdgeInsets.symmetric(horizontal: 50),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(50),
-                            color: primaryColor, // Use the variable here
-                          ),
-                          child: Center(
-                            child: Text(
-                              "Login",
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 15,
-                              ),
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: 20),
+                        const SizedBox(height: 20),
+                        const Text("Forgot Password?",
+                            style: TextStyle(color: Colors.grey)),
+                        const SizedBox(height: 40),
                         GestureDetector(
-                          onTap: () {},
-                          child: RichText(
-                            text: TextSpan(
-                              children: [
-                                TextSpan(
-                                  text: "New Member? ",
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                                TextSpan(
-                                  recognizer: TapGestureRecognizer()
-                                    ..onTap = () {
-                                      // Navigate to logIn page
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => SignUpPage(),
-                                        ),
-                                      );
-                                    },
-                                  text: "Register",
-                                  style: TextStyle(
-                                    color: primaryColor,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                              ],
+                          onTap: _login,
+                          child: Container(
+                            height: 50,
+                            margin: const EdgeInsets.symmetric(horizontal: 50),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(50),
+                              color: primaryColor,
+                            ),
+                            child: Center(
+                              child: _isLoading
+                                  ? const CircularProgressIndicator(
+                                      color: Colors.white,
+                                    )
+                                  : const Text("Login",
+                                      style: TextStyle(
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 15)),
                             ),
                           ),
                         ),
-                        SizedBox(height: 60),
+                        const SizedBox(height: 20),
+                        RichText(
+                          text: TextSpan(
+                            children: [
+                              const TextSpan(
+                                text: "New Member? ",
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              ),
+                              TextSpan(
+                                recognizer: TapGestureRecognizer()
+                                  ..onTap = () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              const SignUpPage()),
+                                    );
+                                  },
+                                text: "Register",
+                                style: const TextStyle(
+                                  color: primaryColor,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 60),
                         Row(
-                          mainAxisAlignment:
-                              MainAxisAlignment.center, // Align to center
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Container(
-                              height: 50,
-                              width: 50, // Set width
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(50),
-                                color: const Color.fromARGB(
-                                  255,
-                                  255,
-                                  255,
-                                  255,
-                                ), // Google's login button is usually white
-                              ),
-                              child: Center(
-                                child: Image.asset(
-                                  'assets/google.png', // Make sure this path is correct
-                                  height: 30, // Adjust size
-                                  width: 30,
-                                ),
-                              ),
-                            ),
-                            SizedBox(width: 20), // Space between buttons
-                            Container(
-                              height: 50,
-                              width: 50, // Added width
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(50),
-                                color: Colors.black,
-                              ),
-                              child: Icon(
-                                Icons.apple,
-                                color: Colors.white,
-                              ), // Added icon
-                            ),
-                            SizedBox(width: 20),
-                            Container(
-                              height: 50,
-                              width: 50, // Set width
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(50),
-                                color: Colors.blue, // Facebook's primary color
-                              ),
-                              child: Center(
-                                child: Icon(
-                                  Icons.facebook, // Facebook icon
-                                  color: Colors.white,
-                                  size: 30, // Adjust size if needed
-                                ),
-                              ),
-                            ),
+                            _socialIcon('assets/google.png'),
+                            const SizedBox(width: 20),
+                            _circleIcon(Icons.apple, Colors.black),
+                            const SizedBox(width: 20),
+                            _circleIcon(Icons.facebook, Colors.blue),
                           ],
                         ),
                       ],
@@ -244,6 +221,28 @@ class LoginPage extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _circleIcon(IconData icon, Color color) {
+    return Container(
+      height: 50,
+      width: 50,
+      decoration:
+          BoxDecoration(borderRadius: BorderRadius.circular(50), color: color),
+      child: Icon(icon, color: Colors.white),
+    );
+  }
+
+  Widget _socialIcon(String assetPath) {
+    return Container(
+      height: 50,
+      width: 50,
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(50), color: Colors.white),
+      child: Center(
+        child: Image.asset(assetPath, height: 30, width: 30),
       ),
     );
   }
