@@ -124,7 +124,7 @@ class _LoginPageState extends State<LoginPage> {
                                     color: Colors.black54,
                                     fontWeight: FontWeight.w400),
                                 decoration: const InputDecoration(
-                                  hintText: "Email",
+                                  hintText: "   Email",
                                   hintStyle: TextStyle(color: Colors.grey),
                                   border: InputBorder.none,
                                   contentPadding: EdgeInsets.only(
