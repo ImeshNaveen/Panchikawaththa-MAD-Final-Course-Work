@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:panchikawaththa/pages/Root.dart';
+import 'package:panchikawaththa/pages/login_page.dart';
 import 'package:panchikawaththa/pages/main_layout.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -16,7 +17,7 @@ class _SplashScreenState extends State<SplashScreen> {
     Future.delayed(const Duration(seconds: 3), () {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const MainLayout()),
+        MaterialPageRoute(builder: (context) => const LoginPage()),
       );
     });
   }
