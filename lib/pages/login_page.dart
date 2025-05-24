@@ -1,6 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:panchikawaththa/pages/main_layout.dart';
 import 'package:panchikawaththa/pages/profile_page.dart';
 import 'package:panchikawaththa/pages/sign_up.dart';
 
@@ -16,6 +17,7 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _isLoading = false;
+  bool _passwordVisible = false;
   final _auth = FirebaseAuth.instance;
 
   void _login() async {
@@ -30,7 +32,7 @@ class _LoginPageState extends State<LoginPage> {
       );
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => Profilepage()),
+        MaterialPageRoute(builder: (context) => MainLayout()),
       ); // Navigate to home or dashboard here
     } on FirebaseAuthException catch (e) {
       String message = 'Login failed';
@@ -52,6 +54,7 @@ class _LoginPageState extends State<LoginPage> {
       body: SafeArea(
         child: Container(
           width: double.infinity,
+          height: double.infinity, // Ensure full height
           decoration: const BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topCenter,
@@ -59,26 +62,24 @@ class _LoginPageState extends State<LoginPage> {
             ),
           ),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const SizedBox(height: 40),
               const Padding(
                 padding: EdgeInsets.all(20),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text('Login',
                         style: TextStyle(
-                            color: Colors.black,
+                            color: Color.fromARGB(255, 255, 255, 255),
                             fontSize: 40,
-                            fontWeight: FontWeight.bold,
                             fontFamily: 'Poppins')),
                     SizedBox(height: 10),
                     Text('Welcome Back',
                         style: TextStyle(
                             color: Colors.white,
                             fontSize: 20,
-                            fontWeight: FontWeight.bold,
                             fontFamily: 'Poppins')),
                   ],
                 ),
@@ -86,42 +87,57 @@ class _LoginPageState extends State<LoginPage> {
               const SizedBox(height: 20),
               Expanded(
                 child: Container(
+                  width: double.infinity,
                   decoration: const BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(60),
-                        topRight: Radius.circular(60)),
+                      topLeft: Radius.circular(60),
+                      topRight: Radius.circular(60),
+                    ),
                   ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(30),
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.symmetric(vertical: 30),
                     child: Column(
                       children: [
                         const SizedBox(height: 60),
                         Column(
                           children: [
                             Container(
+                              height: 55,
+                              margin:
+                                  const EdgeInsets.symmetric(horizontal: 24),
                               decoration: BoxDecoration(
                                 color: Colors.white,
                                 borderRadius: BorderRadius.circular(30),
                                 boxShadow: [
                                   BoxShadow(
-                                      color: Colors.green[200]!,
-                                      blurRadius: 20,
-                                      offset: const Offset(0, 10)),
+                                    color: Colors.green[200]!,
+                                    blurRadius: 20,
+                                    offset: const Offset(0, 10),
+                                  ),
                                 ],
                               ),
                               child: TextField(
                                 controller: _emailController,
                                 keyboardType: TextInputType.emailAddress,
+                                style: const TextStyle(
+                                    color: Colors.black54,
+                                    fontWeight: FontWeight.w400),
                                 decoration: const InputDecoration(
                                   hintText: "Email",
+                                  hintStyle: TextStyle(color: Colors.grey),
                                   border: InputBorder.none,
-                                  contentPadding: EdgeInsets.only(left: 10),
+                                  contentPadding: EdgeInsets.only(
+                                      left: 10,
+                                      top: 16,
+                                      bottom: 16), // Match vertical padding
                                 ),
                               ),
                             ),
-                            const SizedBox(height: 35),
+                            const SizedBox(height: 40),
                             Container(
+                              margin:
+                                  const EdgeInsets.symmetric(horizontal: 24),
                               decoration: BoxDecoration(
                                 color: Colors.white,
                                 borderRadius: BorderRadius.circular(30),
@@ -132,13 +148,37 @@ class _LoginPageState extends State<LoginPage> {
                                       offset: const Offset(0, 10)),
                                 ],
                               ),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 16),
                               child: TextField(
                                 controller: _passwordController,
-                                obscureText: true,
-                                decoration: const InputDecoration(
+                                obscureText: !_passwordVisible,
+                                textAlignVertical: TextAlignVertical
+                                    .center, // Ensures vertical alignment
+                                decoration: InputDecoration(
                                   hintText: "Password",
+                                  hintStyle:
+                                      const TextStyle(color: Colors.grey),
                                   border: InputBorder.none,
-                                  contentPadding: EdgeInsets.only(left: 10),
+                                  contentPadding: const EdgeInsets.only(
+                                      left: 10,
+                                      top: 16,
+                                      bottom: 16), // Add vertical padding
+                                  suffixIcon: IconButton(
+                                    icon: Icon(
+                                      _passwordVisible
+                                          ? Icons.visibility
+                                          : Icons.visibility_off,
+                                      color: Colors.grey,
+                                    ),
+                                    onPressed: () {
+                                      setState(() {
+                                        _passwordVisible = !_passwordVisible;
+                                      });
+                                    },
+                                  ),
+                                  alignLabelWithHint:
+                                      true, // Helps with alignment
                                 ),
                               ),
                             ),
@@ -164,7 +204,7 @@ class _LoginPageState extends State<LoginPage> {
                                     )
                                   : const Text("Login",
                                       style: TextStyle(
-                                          color: Colors.black,
+                                          color: Colors.white,
                                           fontWeight: FontWeight.bold,
                                           fontSize: 15)),
                             ),

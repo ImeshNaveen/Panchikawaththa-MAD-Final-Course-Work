@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:panchikawaththa/pages/profile_page.dart';
 import 'home_page.dart';
 import 'cart_page.dart';
 import 'search.dart';
 import 'wishlist_page.dart';
-//import 'profile_page.dart';
 import 'account_details.dart';
 
 class MainLayout extends StatefulWidget {
@@ -22,7 +22,7 @@ class _MainLayoutState extends State<MainLayout> {
     CartPage(),
     SearchPage(),
     WishlistPage(),
-    AccountDetails(),
+    Profilepage(),
   ];
 
   @override
