@@ -6,6 +6,7 @@ class UserModel {
   final String email;
   final String phone;
   final String profileImageUrl;
+  final String status; // <-- Add this line
 
   UserModel({
     required this.uid,
@@ -13,6 +14,7 @@ class UserModel {
     required this.email,
     required this.phone,
     required this.profileImageUrl,
+    this.status = 'user', // <-- Default to 'user'
   });
 
   /// Creates a UserModel from a map (e.g., from Firestore or JSON).
@@ -23,6 +25,7 @@ class UserModel {
       email: map['email'] ?? '',
       phone: map['phone'] ?? '',
       profileImageUrl: map['profileImageUrl'] ?? '',
+      status: map['status'] ?? 'user', // <-- Add this line
     );
   }
 
@@ -40,6 +43,7 @@ class UserModel {
       'email': email,
       'phone': phone,
       'profileImageUrl': profileImageUrl,
+      'status': status, // <-- Add this line
     };
   }
 
@@ -50,6 +54,7 @@ class UserModel {
     String? email,
     String? phone,
     String? profileImageUrl,
+    String? status, // <-- Add this line
   }) {
     return UserModel(
       uid: uid ?? this.uid,
@@ -57,6 +62,7 @@ class UserModel {
       email: email ?? this.email,
       phone: phone ?? this.phone,
       profileImageUrl: profileImageUrl ?? this.profileImageUrl,
+      status: status ?? this.status, // <-- Add this line
     );
   }
 }

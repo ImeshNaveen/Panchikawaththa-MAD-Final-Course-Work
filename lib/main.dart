@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:panchikawaththa/pages/SpashScreen.dart';
-import 'package:panchikawaththa/pages/main_layout.dart';
+import 'package:panchikawaththa/pages/main_layout.dart' as main_layout;
 import 'package:panchikawaththa/pages/login_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -51,7 +51,7 @@ class AuthWrapper extends StatelessWidget {
 
         // If user is logged in
         if (snapshot.hasData) {
-          return const MainLayout();
+          return const main_layout.MainLayout();
         }
 
         // If user is logged out

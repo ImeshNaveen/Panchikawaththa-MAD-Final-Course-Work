@@ -8,6 +8,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:panchikawaththa/models/user_model.dart';
 import 'package:panchikawaththa/pages/RecentPurchasesPage.dart';
 import 'package:panchikawaththa/pages/add_new_card_page.dart';
+import 'package:panchikawaththa/pages/admin_dashboard_page.dart';
 import 'package:panchikawaththa/pages/edit_profile_page.dart';
 import 'package:panchikawaththa/pages/help_center_page.dart';
 import 'package:panchikawaththa/pages/return_details_page.dart';
@@ -91,7 +92,6 @@ class _AccountPageState extends State<AccountPage> {
     }
   }
 
-  /// Decode base64 string to image bytes
   ImageProvider getUserImage(String base64Image) {
     try {
       Uint8List bytes = base64Decode(base64Image);
@@ -157,7 +157,7 @@ class _AccountPageState extends State<AccountPage> {
       );
     }
 
-    final ImageProvider avatarImage = userModel!.profileImageUrl.isNotEmpty
+    final avatarImage = userModel!.profileImageUrl.isNotEmpty
         ? getUserImage(userModel!.profileImageUrl)
         : const AssetImage("assets/profile.jpeg");
 
@@ -165,42 +165,31 @@ class _AccountPageState extends State<AccountPage> {
       body: SafeArea(
         child: Column(
           children: [
-            // Top bar
             Padding(
               padding:
                   const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
               child: Row(
                 children: [
                   const SizedBox(width: 8),
-                  const Text(
-                    'Account',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
+                  const Text('Account',
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                   const Spacer(),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => SettingPage()));
-                    },
-                    child: const Icon(Icons.settings),
+                  IconButton(
+                    icon: const Icon(Icons.settings),
+                    onPressed: () => Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => SettingPage())),
                   ),
-                  const SizedBox(width: 16),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => NotificationsPage()));
-                    },
-                    child: const Icon(Icons.notifications_none),
+                  IconButton(
+                    icon: const Icon(Icons.notifications_none),
+                    onPressed: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => NotificationsPage())),
                   ),
                 ],
               ),
             ),
-
-            // Profile card
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Container(
@@ -210,11 +199,10 @@ class _AccountPageState extends State<AccountPage> {
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.grey.withOpacity(0.1),
-                      spreadRadius: 1,
-                      blurRadius: 5,
-                      offset: const Offset(0, 3),
-                    ),
+                        color: Colors.grey.withOpacity(0.1),
+                        spreadRadius: 1,
+                        blurRadius: 5,
+                        offset: const Offset(0, 3))
                   ],
                 ),
                 child: Row(
@@ -223,179 +211,157 @@ class _AccountPageState extends State<AccountPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            userModel!.name,
-                            style: const TextStyle(
-                                fontSize: 24, fontWeight: FontWeight.bold),
-                          ),
+                          Text(userModel!.name,
+                              style: const TextStyle(
+                                  fontSize: 24, fontWeight: FontWeight.bold)),
                           const SizedBox(height: 8),
-                          Row(
-                            children: [
-                              const Icon(Icons.email,
-                                  size: 16, color: Colors.grey),
-                              const SizedBox(width: 8),
-                              Text(
-                                userModel!.email,
-                                style: const TextStyle(color: Colors.grey),
-                              ),
-                            ],
-                          ),
+                          Row(children: [
+                            const Icon(Icons.email,
+                                size: 16, color: Colors.grey),
+                            const SizedBox(width: 8),
+                            Text(userModel!.email,
+                                style: const TextStyle(color: Colors.grey))
+                          ]),
                           const SizedBox(height: 4),
-                          Row(
-                            children: [
-                              const Icon(Icons.phone,
-                                  size: 16, color: Colors.grey),
-                              const SizedBox(width: 8),
-                              Text(
-                                userModel!.phone,
-                                style: const TextStyle(color: Colors.grey),
-                              ),
-                            ],
-                          ),
+                          Row(children: [
+                            const Icon(Icons.phone,
+                                size: 16, color: Colors.grey),
+                            const SizedBox(width: 8),
+                            Text(userModel!.phone,
+                                style: const TextStyle(color: Colors.grey))
+                          ]),
                         ],
                       ),
                     ),
                     Column(
                       children: [
-                        CircleAvatar(
-                          radius: 30,
-                          backgroundImage: avatarImage,
-                        ),
+                        CircleAvatar(radius: 30, backgroundImage: avatarImage),
                         const SizedBox(height: 8),
                         GestureDetector(
-                          onTap: () {
-                            Navigator.push(
+                          onTap: () => Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => EditProfilePage()),
-                            );
-                          },
+                                  builder: (context) => EditProfilePage())),
                           child: Container(
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 12, vertical: 6),
                             decoration: BoxDecoration(
-                              color: Colors.green,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
+                                color: Colors.green,
+                                borderRadius: BorderRadius.circular(20)),
                             child: Row(
                               children: const [
-                                Text(
-                                  'Edit Profile',
-                                  style: TextStyle(
-                                      color: Colors.white, fontSize: 12),
-                                ),
+                                Text('Edit Profile',
+                                    style: TextStyle(
+                                        color: Colors.white, fontSize: 12)),
                                 Icon(Icons.arrow_forward_ios,
-                                    size: 12, color: Colors.white),
+                                    size: 12, color: Colors.white)
                               ],
                             ),
                           ),
                         ),
+                        const SizedBox(height: 8),
+                        // Admin Panel Button — visible only if user role is admin
+                        if (userModel!.status == 'admin')
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: SizedBox(
+                              height: 28,
+                              child: TextButton(
+                                style: TextButton.styleFrom(
+                                  backgroundColor: Colors.green,
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 12),
+                                  minimumSize: Size.zero,
+                                  tapTargetSize:
+                                      MaterialTapTargetSize.shrinkWrap,
+                                ),
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            AdminDashboardPage()),
+                                  );
+                                },
+                                child: const Text(
+                                  'Admin Panel',
+                                  style: TextStyle(
+                                      fontSize: 12, color: Colors.white),
+                                ),
+                              ),
+                            ),
+                          ),
                       ],
                     ),
                   ],
                 ),
               ),
             ),
-
-            // Menu
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   GestureDetector(
-                    onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => HelpCenterPage())),
-                    child: _buildMenuItem(Icons.headset, 'Help Center'),
-                  ),
+                      onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => HelpCenterPage())),
+                      child: _buildMenuItem(Icons.headset, 'Help Center')),
                   GestureDetector(
-                    onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => SavedCardsPage())),
-                    child: _buildMenuItem(Icons.credit_card, 'Cards'),
-                  ),
+                      onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => SavedCardsPage())),
+                      child: _buildMenuItem(Icons.credit_card, 'Cards')),
                   GestureDetector(
-                    onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => ReturnDetailsPage())),
-                    child: _buildMenuItem(Icons.keyboard_return, 'Return'),
-                  ),
+                      onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => ReturnDetailsPage())),
+                      child: _buildMenuItem(Icons.keyboard_return, 'Return')),
                   GestureDetector(
-                    onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => StoreCouponPage())),
-                    child: _buildMenuItem(Icons.card_giftcard, 'Coupons'),
-                  ),
+                      onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => StoreCouponPage())),
+                      child: _buildMenuItem(Icons.card_giftcard, 'Coupons')),
                 ],
               ),
             ),
-
             const Divider(height: 32),
-
-            // Recent Purchases
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
-                    'Recent Purchases',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                  const Text('Recent Purchases',
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                   GestureDetector(
                     onTap: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const RecentPurchasesPage()),
-                    ),
-                    child: const Text(
-                      'Show all',
-                      style: TextStyle(
-                        color: Colors.blue,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const RecentPurchasesPage())),
+                    child: const Text('Show all',
+                        style: TextStyle(
+                            color: Colors.blue, fontWeight: FontWeight.bold)),
                   ),
                 ],
               ),
             ),
-
             const SizedBox(height: 16),
-
             Expanded(
               child: ListView(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 children: [
-                  _buildPurchaseItem(
-                    'Item Name',
-                    '375,000.00',
-                    '5',
-                    '75,000.00',
-                    'assets/wheel.jpg',
-                    isDelivered: false,
-                  ),
-                  _buildPurchaseItem(
-                    'Exide Battery',
-                    '45,000.00',
-                    '1',
-                    '45,000.00',
-                    'assets/wheel.jpg',
-                  ),
-                  _buildPurchaseItem(
-                    'Turbo unit',
-                    '75,000.00',
-                    '1',
-                    '75,000.00',
-                    'assets/wheel.jpg',
-                  ),
+                  _buildPurchaseItem('Item Name', '375,000.00', '5',
+                      '75,000.00', 'assets/wheel.jpg',
+                      isDelivered: false),
+                  _buildPurchaseItem('Exide Battery', '45,000.00', '1',
+                      '45,000.00', 'assets/wheel.jpg'),
+                  _buildPurchaseItem('Turbo unit', '75,000.00', '1',
+                      '75,000.00', 'assets/wheel.jpg'),
                 ],
               ),
             ),
