@@ -16,6 +16,7 @@ import 'help_center_page.dart';
 import 'store_coupon_page.dart';
 import 'return_details_page.dart';
 import 'productDetailpage.dart';
+import 'orderConfirmation.dart';
 
 class RootPage extends StatelessWidget {
   const RootPage({super.key});
@@ -447,6 +448,33 @@ class RootPage extends StatelessWidget {
                         );
                       },
                       child: Text('category Page'),
+                    ),
+                  ),
+                ),
+
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: TextButton(
+                      style: TextButton.styleFrom(
+                        foregroundColor: Colors.white,
+                        backgroundColor: Colors.transparent,
+                        padding: EdgeInsets.all(16.0),
+                        textStyle: TextStyle(fontSize: 16),
+                        side: BorderSide(color: Colors.white),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                      ),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => OrderConfirmationApp()),
+                        );
+                      },
+                      child: Text('order confirmation'),
                     ),
                   ),
                 ),
