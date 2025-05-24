@@ -1,8 +1,10 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:panchikawaththa/models/user_model.dart';
+import 'package:panchikawaththa/pages/admin_dashboard_page.dart';
 import 'package:panchikawaththa/pages/main_layout.dart';
-import 'package:panchikawaththa/pages/profile_page.dart';
 import 'package:panchikawaththa/pages/sign_up.dart';
 
 class LoginPage extends StatefulWidget {
@@ -23,17 +25,47 @@ class _LoginPageState extends State<LoginPage> {
   void _login() async {
     setState(() => _isLoading = true);
     try {
-      await _auth.signInWithEmailAndPassword(
+      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Login Successful')),
-      );
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => MainLayout()),
-      ); // Navigate to home or dashboard here
+
+      User? firebaseUser = userCredential.user;
+
+      if (firebaseUser != null) {
+        final userDoc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(firebaseUser.uid)
+            .get();
+
+        if (userDoc.exists) {
+          UserModel user = UserModel.fromDocument(userDoc);
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Login Successful')),
+          );
+
+          if (user.status == 'admin') {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const AdminDashboardPage(),
+              ),
+            );
+          } else {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => MainLayout(userData: user),
+              ),
+            );
+          }
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('User profile not found.')),
+          );
+        }
+      }
     } on FirebaseAuthException catch (e) {
       String message = 'Login failed';
       if (e.code == 'user-not-found')
@@ -54,7 +86,7 @@ class _LoginPageState extends State<LoginPage> {
       body: SafeArea(
         child: Container(
           width: double.infinity,
-          height: double.infinity, // Ensure full height
+          height: double.infinity,
           decoration: const BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topCenter,
@@ -72,7 +104,7 @@ class _LoginPageState extends State<LoginPage> {
                   children: [
                     Text('Login',
                         style: TextStyle(
-                            color: Color.fromARGB(255, 255, 255, 255),
+                            color: Colors.white,
                             fontSize: 40,
                             fontFamily: 'Poppins')),
                     SizedBox(height: 10),
@@ -102,85 +134,16 @@ class _LoginPageState extends State<LoginPage> {
                         const SizedBox(height: 60),
                         Column(
                           children: [
-                            Container(
-                              height: 55,
-                              margin:
-                                  const EdgeInsets.symmetric(horizontal: 24),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(30),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.green[200]!,
-                                    blurRadius: 20,
-                                    offset: const Offset(0, 10),
-                                  ),
-                                ],
-                              ),
-                              child: TextField(
-                                controller: _emailController,
-                                keyboardType: TextInputType.emailAddress,
-                                style: const TextStyle(
-                                    color: Colors.black54,
-                                    fontWeight: FontWeight.w400),
-                                decoration: const InputDecoration(
-                                  hintText: "Email",
-                                  hintStyle: TextStyle(color: Colors.grey),
-                                  border: InputBorder.none,
-                                  contentPadding: EdgeInsets.only(
-                                      left: 10,
-                                      top: 16,
-                                      bottom: 16), // Match vertical padding
-                                ),
-                              ),
+                            _buildInputField(
+                              controller: _emailController,
+                              hintText: "Email",
+                              isPassword: false,
                             ),
                             const SizedBox(height: 40),
-                            Container(
-                              margin:
-                                  const EdgeInsets.symmetric(horizontal: 24),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(30),
-                                boxShadow: [
-                                  BoxShadow(
-                                      color: Colors.green[200]!,
-                                      blurRadius: 20,
-                                      offset: const Offset(0, 10)),
-                                ],
-                              ),
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 16),
-                              child: TextField(
-                                controller: _passwordController,
-                                obscureText: !_passwordVisible,
-                                textAlignVertical: TextAlignVertical
-                                    .center, // Ensures vertical alignment
-                                decoration: InputDecoration(
-                                  hintText: "Password",
-                                  hintStyle:
-                                      const TextStyle(color: Colors.grey),
-                                  border: InputBorder.none,
-                                  contentPadding: const EdgeInsets.only(
-                                      left: 10,
-                                      top: 16,
-                                      bottom: 16), // Add vertical padding
-                                  suffixIcon: IconButton(
-                                    icon: Icon(
-                                      _passwordVisible
-                                          ? Icons.visibility
-                                          : Icons.visibility_off,
-                                      color: Colors.grey,
-                                    ),
-                                    onPressed: () {
-                                      setState(() {
-                                        _passwordVisible = !_passwordVisible;
-                                      });
-                                    },
-                                  ),
-                                  alignLabelWithHint:
-                                      true, // Helps with alignment
-                                ),
-                              ),
+                            _buildInputField(
+                              controller: _passwordController,
+                              hintText: "Password",
+                              isPassword: true,
                             ),
                           ],
                         ),
@@ -265,6 +228,53 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
+  Widget _buildInputField({
+    required TextEditingController controller,
+    required String hintText,
+    required bool isPassword,
+  }) {
+    return Container(
+      height: 55,
+      margin: const EdgeInsets.symmetric(horizontal: 24),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(30),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.green[200]!,
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: TextField(
+        controller: controller,
+        obscureText: isPassword && !_passwordVisible,
+        style:
+            const TextStyle(color: Colors.black54, fontWeight: FontWeight.w400),
+        decoration: InputDecoration(
+          hintText: "   $hintText",
+          hintStyle: const TextStyle(color: Colors.grey),
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.only(left: 10, top: 16, bottom: 16),
+          suffixIcon: isPassword
+              ? IconButton(
+                  icon: Icon(
+                    _passwordVisible ? Icons.visibility : Icons.visibility_off,
+                    color: Colors.grey,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      _passwordVisible = !_passwordVisible;
+                    });
+                  },
+                )
+              : null,
+        ),
+      ),
+    );
+  }
+
   Widget _circleIcon(IconData icon, Color color) {
     return Container(
       height: 50,
@@ -283,6 +293,25 @@ class _LoginPageState extends State<LoginPage> {
           borderRadius: BorderRadius.circular(50), color: Colors.white),
       child: Center(
         child: Image.asset(assetPath, height: 30, width: 30),
+      ),
+    );
+  }
+}
+
+class MainLayout extends StatelessWidget {
+  final UserModel userData; // or whatever type userData is
+
+  const MainLayout({Key? key, required this.userData}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    // Your MainLayout implementation
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Main Layout'),
+      ),
+      body: Center(
+        child: Text('Welcome, ${userData.name}'), // Example usage
       ),
     );
   }
