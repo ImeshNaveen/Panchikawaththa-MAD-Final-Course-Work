@@ -5,9 +5,11 @@ import 'package:panchikawaththa/pages/login_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load();
   await Firebase.initializeApp();
   runApp(const MyApp());
 }
@@ -44,17 +46,17 @@ class AuthWrapper extends StatelessWidget {
     return StreamBuilder<User?>(
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
-        // While checking auth status
+        print('Connection State: ${snapshot.connectionState}');
+        print('User: ${snapshot.data}');
+
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const SplashScreen();
         }
 
-        // If user is logged in
         if (snapshot.hasData) {
           return const main_layout.MainLayout();
         }
 
-        // If user is logged out
         return const LoginPage();
       },
     );
