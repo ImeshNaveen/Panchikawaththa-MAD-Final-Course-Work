@@ -170,10 +170,13 @@ class _HomePageState extends State<HomePage>
             ),
           ),
           if (_showSupportMenu) ...[
+            // Add a semi-transparent background for emphasis
             Positioned.fill(
               child: GestureDetector(
                 onTap: _toggleSupportMenu,
-                child: Container(color: Colors.black.withOpacity(0.15)),
+                child: Container(
+                  color: Colors.black.withOpacity(0.15),
+                ),
               ),
             ),
             Positioned(
@@ -228,8 +231,12 @@ class _HomePageState extends State<HomePage>
                   key: ValueKey('close'), color: Colors.white, size: 32)
               : ClipOval(
                   key: ValueKey('bot'),
-                  child: Image.asset('assets/mario_bot.jpg',
-                      width: 46, height: 46, fit: BoxFit.cover),
+                  child: Image.asset(
+                    'assets/mario_bot.jpg',
+                    width: 46,
+                    height: 46,
+                    fit: BoxFit.cover,
+                  ),
                 ),
         ),
       ),
