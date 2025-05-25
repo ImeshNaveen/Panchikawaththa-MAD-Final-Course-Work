@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'manage_categories_page.dart';
-// Import your login page or main app entry point
+import 'manage_products_page.dart'; // You need to create this page
 import 'login_page.dart'; // Update this to your actual login page
 
 class AdminDashboardPage extends StatelessWidget {
@@ -10,10 +10,8 @@ class AdminDashboardPage extends StatelessWidget {
   void _logoutAndRestart(BuildContext context) async {
     await FirebaseAuth.instance.signOut();
 
-    // Restart app by navigating to login or welcome screen and clearing history
     Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(
-          builder: (context) => const LoginPage()), // Update this if needed
+      MaterialPageRoute(builder: (context) => const LoginPage()),
       (Route<dynamic> route) => false,
     );
   }
@@ -51,7 +49,20 @@ class AdminDashboardPage extends StatelessWidget {
                 );
               },
             ),
-            // Add more cards here as needed
+            _buildDashboardCard(
+              context,
+              icon: Icons.shopping_bag,
+              label: 'Manage Products',
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ManageProductsPage(),
+                  ),
+                );
+              },
+            ),
+            // Add more cards here if needed
           ],
         ),
       ),

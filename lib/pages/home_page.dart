@@ -8,6 +8,8 @@ import 'package:panchikawaththa/pages/productDetailpage.dart';
 import 'package:panchikawaththa/pages/review.dart';
 import 'package:panchikawaththa/pages/serviceCenter.dart';
 import 'package:panchikawaththa/models/category_model.dart';
+import 'package:panchikawaththa/models/product_model.dart';
+import 'package:panchikawaththa/services/ProductService.dart';
 import 'package:panchikawaththa/services/category_service.dart';
 
 class HomePage extends StatefulWidget {
@@ -21,12 +23,15 @@ class _HomePageState extends State<HomePage>
     with SingleTickerProviderStateMixin {
   bool _showSupportMenu = false;
   List<Category> _categories = [];
+  List<Product> _products = [];
   bool _isLoading = true;
+  bool _isProductLoading = true;
 
   @override
   void initState() {
     super.initState();
     _loadCategories();
+    _loadProducts();
   }
 
   Future<void> _loadCategories() async {
@@ -34,6 +39,14 @@ class _HomePageState extends State<HomePage>
     setState(() {
       _categories = categories;
       _isLoading = false;
+    });
+  }
+
+  Future<void> _loadProducts() async {
+    final products = await ProductService().getProducts();
+    setState(() {
+      _products = products;
+      _isProductLoading = false;
     });
   }
 
@@ -135,29 +148,35 @@ class _HomePageState extends State<HomePage>
                       style: TextStyle(
                           fontSize: 16.sp, fontWeight: FontWeight.bold)),
                   SizedBox(height: 12.h),
-                  GridView.builder(
-                    itemCount: 4,
-                    shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      mainAxisSpacing: 16.h,
-                      crossAxisSpacing: 16.w,
-                      childAspectRatio: 0.7,
-                    ),
-                    itemBuilder: (context, index) {
-                      return dealCard(context);
-                    },
-                  )
+                  _isProductLoading
+                      ? Center(child: CircularProgressIndicator())
+                      : GridView.builder(
+                          itemCount: _products.length,
+                          shrinkWrap: true,
+                          physics: NeverScrollableScrollPhysics(),
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            mainAxisSpacing: 16.h,
+                            crossAxisSpacing: 16.w,
+                            childAspectRatio: 0.7,
+                          ),
+                          itemBuilder: (context, index) {
+                            return dealCard(context, _products[index]);
+                          },
+                        )
                 ],
               ),
             ),
           ),
           if (_showSupportMenu) ...[
+            // Add a semi-transparent background for emphasis
             Positioned.fill(
               child: GestureDetector(
                 onTap: _toggleSupportMenu,
-                child: Container(color: Colors.black.withOpacity(0.15)),
+                child: Container(
+                  color: Colors.black.withOpacity(0.15),
+                ),
               ),
             ),
             Positioned(
@@ -212,8 +231,12 @@ class _HomePageState extends State<HomePage>
                   key: ValueKey('close'), color: Colors.white, size: 32)
               : ClipOval(
                   key: ValueKey('bot'),
-                  child: Image.asset('assets/mario_bot.jpg',
-                      width: 46, height: 46, fit: BoxFit.cover),
+                  child: Image.asset(
+                    'assets/mario_bot.jpg',
+                    width: 46,
+                    height: 46,
+                    fit: BoxFit.cover,
+                  ),
                 ),
         ),
       ),
@@ -267,7 +290,7 @@ class _HomePageState extends State<HomePage>
     );
   }
 
-  Widget dealCard(BuildContext context) {
+  Widget dealCard(BuildContext context, Product product) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -281,7 +304,11 @@ class _HomePageState extends State<HomePage>
         onTap: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => ProductDetailPage()),
+            MaterialPageRoute(
+                builder: (context) => ProductDetailPage(
+                      productId: product.id,
+                      Product: product,
+                    )),
           );
         },
         child: Column(
@@ -289,8 +316,12 @@ class _HomePageState extends State<HomePage>
           children: [
             ClipRRect(
               borderRadius: BorderRadius.vertical(top: Radius.circular(12.r)),
-              child: Image.asset("assets/product.png",
-                  height: 100.h, width: double.infinity, fit: BoxFit.cover),
+              child: Image.memory(
+                base64Decode(product.imageBase64),
+                height: 100.h,
+                width: double.infinity,
+                fit: BoxFit.cover,
+              ),
             ),
             Padding(
               padding: EdgeInsets.all(8.w),
@@ -299,25 +330,26 @@ class _HomePageState extends State<HomePage>
                 children: [
                   Row(
                     children: List.generate(
-                        5,
-                        (index) =>
-                            Icon(Icons.star, color: Colors.amber, size: 14.sp)),
+                      5,
+                      (index) =>
+                          Icon(Icons.star, color: Colors.amber, size: 14.sp),
+                    ),
                   ),
                   SizedBox(height: 4.h),
                   Text(
-                    "BMW Tire Valve Stem Caps - Set of 4",
+                    product.name,
                     style:
                         TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w500),
                     maxLines: 2,
                   ),
                   SizedBox(height: 4.h),
-                  Text("LKR 2,000.00",
+                  Text("LKR ${product.price.toStringAsFixed(2)}",
                       style: TextStyle(fontSize: 12.sp, color: Colors.black87)),
                   SizedBox(height: 4.h),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text("42 sold",
+                      Text("${product.sold} sold",
                           style:
                               TextStyle(fontSize: 10.sp, color: Colors.grey)),
                       Icon(Icons.shopping_cart,
