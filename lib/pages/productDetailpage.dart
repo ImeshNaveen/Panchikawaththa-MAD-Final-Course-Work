@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:panchikawaththa/models/product_model.dart';
@@ -6,15 +7,14 @@ import 'seller_page.dart';
 
 class ProductDetailPage extends StatefulWidget {
   final String productId;
-  const ProductDetailPage(
-      {super.key, required this.productId, required Product Product});
+  const ProductDetailPage({super.key, required this.productId});
 
   @override
   State<ProductDetailPage> createState() => _ProductDetailPageState();
 }
 
 class _ProductDetailPageState extends State<ProductDetailPage> {
-  Map<String, dynamic>? productData;
+  Product? product;
   bool isLoading = true;
 
   static const Color primaryColor = Color.fromARGB(255, 20, 211, 3);
@@ -26,16 +26,32 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
   }
 
   Future<void> _loadProduct() async {
-    final doc = await FirebaseFirestore.instance
-        .collection('products')
-        .doc(widget.productId)
-        .get();
+    try {
+      final doc = await FirebaseFirestore.instance
+          .collection('products')
+          .doc(widget.productId)
+          .get();
 
-    if (doc.exists) {
+      if (doc.exists) {
+        setState(() {
+          product = Product.fromJson(doc.data()!);
+          isLoading = false;
+        });
+      } else {
+        setState(() {
+          isLoading = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Product not found.')),
+        );
+      }
+    } catch (e) {
       setState(() {
-        productData = doc.data();
         isLoading = false;
       });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error loading product: $e')),
+      );
     }
   }
 
@@ -51,18 +67,17 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    if (isLoading || productData == null) {
+    if (isLoading) {
       return const Scaffold(
         body: Center(child: CircularProgressIndicator()),
       );
     }
 
-    final images = List<String>.from(productData!['images']);
-    final title = productData!['title'];
-    final price = productData!['price'];
-    final description = productData!['description'];
-    final rating = productData!['rating'].toDouble();
-    final totalRatings = productData!['totalRatings'];
+    if (product == null) {
+      return const Scaffold(
+        body: Center(child: Text("Product details not available")),
+      );
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -110,27 +125,29 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
           children: [
             SizedBox(
               height: 320,
-              child: ListView.builder(
+              child: ListView(
                 scrollDirection: Axis.horizontal,
-                itemCount: images.length,
-                itemBuilder: (context, index) {
-                  return Container(
+                children: [
+                  Container(
                     margin: const EdgeInsets.only(right: 10),
                     width: MediaQuery.of(context).size.width - 40,
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(10),
-                      child: Image.network(images[index], fit: BoxFit.cover),
+                      child: Image.memory(
+                        base64Decode(product!.imageBase64),
+                        fit: BoxFit.cover,
+                      ),
                     ),
-                  );
-                },
+                  )
+                ],
               ),
             ),
             const SizedBox(height: 16),
-            Text(title,
+            Text(product!.name,
                 style:
                     const TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
             const SizedBox(height: 6),
-            Text("LKR ${price.toStringAsFixed(2)}",
+            Text("LKR ${product!.price.toStringAsFixed(2)}",
                 style:
                     const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
@@ -158,20 +175,20 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
                         (_) => const Icon(Icons.star,
                             color: Colors.orange, size: 20))),
                 const SizedBox(width: 4),
-                Text(rating.toStringAsFixed(1),
+                Text(product!.rating.toStringAsFixed(1),
                     style: const TextStyle(
                         fontSize: 16, fontWeight: FontWeight.bold)),
                 const SizedBox(width: 10),
-                Text("($totalRatings ratings)"),
+                Text("(${product!.sold} ratings)"),
               ],
             ),
             const Divider(height: 30),
-            ReviewsPage(), // You can link Firestore reviews here too
+            ReviewsPage(productId: product!.id),
             const Divider(height: 30),
             const Text("Product details",
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
-            Text(description,
+            Text(product!.description,
                 style: const TextStyle(fontSize: 14, height: 1.5)),
             const SizedBox(height: 100),
           ],
