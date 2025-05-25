@@ -4,6 +4,9 @@ import 'package:http/http.dart' as http;
 import 'ReviewForm.dart';
 
 class ReviewsPage extends StatefulWidget {
+  final String productId;
+  const ReviewsPage({super.key, required this.productId});
+
   @override
   _ReviewsPageState createState() => _ReviewsPageState();
 }
@@ -27,18 +30,23 @@ class _ReviewsPageState extends State<ReviewsPage> {
   }
 
   Future<void> fetchReviews() async {
-    final response =
-        await http.get(Uri.parse('https://your-api-url.com/reviews'));
+    final response = await http.get(
+      Uri.parse(
+          'https://your-api-url.com/reviews?productId=${widget.productId}'),
+    );
 
     if (response.statusCode == 200) {
       final List<dynamic> data = jsonDecode(response.body);
+
+      // Optional: If API does not support filtering, filter manually here
+      // final filteredData = data.where((review) => review['productId'] == widget.productId).toList();
+
       setState(() {
         reviews = data;
         calculateRatingCounts();
         isLoading = false;
       });
     } else {
-      // Handle error
       setState(() {
         isLoading = false;
       });
@@ -65,15 +73,13 @@ class _ReviewsPageState extends State<ReviewsPage> {
     return totalRatings > 0 ? totalStars / totalRatings : 0.0;
   }
 
-  int get totalRatings {
-    return ratingCount.values.reduce((a, b) => a + b);
-  }
+  int get totalRatings => ratingCount.values.reduce((a, b) => a + b);
 
   void _showReviewPopup(BuildContext context) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      builder: (_) => ReviewForm(),
+      builder: (_) => ReviewForm(productId: widget.productId),
     );
   }
 

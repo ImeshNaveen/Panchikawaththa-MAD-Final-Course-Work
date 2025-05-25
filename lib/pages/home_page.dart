@@ -305,10 +305,8 @@ class _HomePageState extends State<HomePage>
           Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => ProductDetailPage(
-                      productId: product.id,
-                      Product: product,
-                    )),
+              builder: (context) => ProductDetailPage(productId: product.id),
+            ),
           );
         },
         child: Column(
