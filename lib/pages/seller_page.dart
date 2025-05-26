@@ -129,7 +129,7 @@ class SellerPage extends StatelessWidget {
                   color: Colors.white,
                   onTap: () {
                     _launchCaller(
-                        '+94760254822'); // Replace with actual phone number
+                        '+94712345678'); // Replace with actual phone number
                   },
                 ),
                 _actionButton(
@@ -139,7 +139,7 @@ class SellerPage extends StatelessWidget {
                   color: Colors.white,
                   onTap: () {
                     _launchSMS(
-                        '+94760254822'); // Replace with actual phone number
+                        '+94712345678'); // Replace with actual phone number
                   },
                 ),
               ],

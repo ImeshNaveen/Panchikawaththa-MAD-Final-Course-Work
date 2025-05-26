@@ -1,22 +1,14 @@
 plugins {
-    id "com.android.application"
+    id 'com.android.application'
     id "kotlin-android"
-    // The Flutter Gradle Plugin must be applied last
-    id "dev.flutter.flutter-gradle-plugin"
+    id 'dev.flutter.flutter-gradle-plugin'
+    id 'com.google.gms.google-services'
 }
 
 android {
-    namespace = "com.example.panchikawaththa"
+    namespace = 'com.example.panchikawaththa'
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
-
-    defaultConfig {
-        applicationId = "com.example.panchikawaththa"
-        minSdk = flutter.minSdkVersion
-        targetSdk = flutter.targetSdkVersion
-        versionCode = flutter.versionCode
-        versionName = flutter.versionName
-    }
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
@@ -24,16 +16,30 @@ android {
     }
 
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = JavaVersion.VERSION_1_8
+    }
+
+    defaultConfig {
+        applicationId "com.example.panchikawaththa"
+        minSdkVersion 23
+        targetSdkVersion flutter.targetSdkVersion
+        versionCode flutter.versionCode
+        versionName flutter.versionName
     }
 
     buildTypes {
         release {
-            signingConfig = signingConfigs.debug // Use debug signing for release until configured
+            signingConfig = signingConfigs.debug
         }
     }
 }
 
 flutter {
-    source = "../.."
+    source "../.."
+}
+
+dependencies {
+  implementation platform('com.google.firebase:firebase-bom:33.13.0')
+  implementation 'com.google.firebase:firebase-analytics'
+  implementation 'com.google.firebase:firebase-auth'
 }

@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:panchikawaththa/pages/restart_widget.dart';
+// Import this
 
 class LogoutPage extends StatelessWidget {
   const LogoutPage({super.key});
 
-  void _logout(BuildContext context) {
-    // TODO: Clear user session, tokens, etc.
+  Future<void> _logout(BuildContext context) async {
+    await FirebaseAuth.instance.signOut();
 
-    // Navigate to login screen or root
-    Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(builder: (context) => const LoginPage()),
-      (route) => false,
-    );
+    // Restart the app
+    RestartWidget.restartApp(context);
   }
 
   @override
@@ -45,7 +45,7 @@ class LogoutPage extends StatelessWidget {
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.redAccent,
-                    foregroundColor: Colors.white, // Set text color to white
+                    foregroundColor: Colors.white,
                   ),
                   onPressed: () => _logout(context),
                   child: const Text("Logout"),
@@ -55,19 +55,6 @@ class LogoutPage extends StatelessWidget {
           ],
         ),
       ),
-    );
-  }
-}
-
-// Dummy login page (replace with your real one)
-class LoginPage extends StatelessWidget {
-  const LoginPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("Login")),
-      body: const Center(child: Text("Login Page")),
     );
   }
 }

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:panchikawaththa/pages/category.dart';
@@ -6,6 +7,10 @@ import 'package:panchikawaththa/pages/notification.dart';
 import 'package:panchikawaththa/pages/productDetailpage.dart';
 import 'package:panchikawaththa/pages/review.dart';
 import 'package:panchikawaththa/pages/serviceCenter.dart';
+import 'package:panchikawaththa/models/category_model.dart';
+import 'package:panchikawaththa/models/product_model.dart';
+import 'package:panchikawaththa/services/ProductService.dart';
+import 'package:panchikawaththa/services/category_service.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -17,6 +22,33 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage>
     with SingleTickerProviderStateMixin {
   bool _showSupportMenu = false;
+  List<Category> _categories = [];
+  List<Product> _products = [];
+  bool _isLoading = true;
+  bool _isProductLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCategories();
+    _loadProducts();
+  }
+
+  Future<void> _loadCategories() async {
+    final categories = await CategoryService().getCategories();
+    setState(() {
+      _categories = categories;
+      _isLoading = false;
+    });
+  }
+
+  Future<void> _loadProducts() async {
+    final products = await ProductService().getProducts();
+    setState(() {
+      _products = products;
+      _isProductLoading = false;
+    });
+  }
 
   void _toggleSupportMenu() {
     setState(() {
@@ -39,19 +71,9 @@ class _HomePageState extends State<HomePage>
                 children: [
                   SizedBox(height: 10.h),
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Image.asset(
-                        "assets/logo.png",
-                        height: 35.h,
-                      ),
-                      SizedBox(width: 10.w),
-                      Expanded(
-                        child: Text(
-                          textAlign: TextAlign.center,
-                          'Welcome To Digital Panchikawaththa',
-                          style: TextStyle(fontSize: 12.sp),
-                        ),
-                      ),
+                      Image.asset("assets/logo.png", height: 50.h),
                       GestureDetector(
                         onTap: () {
                           Navigator.push(
@@ -95,86 +117,58 @@ class _HomePageState extends State<HomePage>
                     ],
                   ),
                   SizedBox(height: 24.h),
-                  Text(
-                    'Categories',
-                    style:
-                        TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold),
-                  ),
+                  Text('Categories',
+                      style: TextStyle(
+                          fontSize: 16.sp, fontWeight: FontWeight.bold)),
                   SizedBox(height: 12.h),
-                  SizedBox(
-                    height: 60.h,
-                    child: ListView(
-                      scrollDirection: Axis.horizontal,
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => CategoryPage()),
-                            );
-                          },
-                          child: categoryItem("wheel.jpg"),
+                  _isLoading
+                      ? Center(child: CircularProgressIndicator())
+                      : SizedBox(
+                          height: 60.h,
+                          child: ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            itemCount: _categories.length,
+                            itemBuilder: (context, index) {
+                              final category = _categories[index];
+                              return GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => CategoryPage()),
+                                  );
+                                },
+                                child: categoryItem(category.imageBase64),
+                              );
+                            },
+                          ),
                         ),
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => CategoryPage()),
-                            );
-                          },
-                          child: categoryItem("Engine.png"),
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => CategoryPage()),
-                            );
-                          },
-                          child: categoryItem("brake.jpg"),
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => CategoryPage()),
-                            );
-                          },
-                          child: categoryItem("light.jpg"),
-                        ),
-                      ],
-                    ),
-                  ),
                   SizedBox(height: 24.h),
-                  Text(
-                    'Today Hot Deals',
-                    style:
-                        TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold),
-                  ),
+                  Text('Today Hot Deals',
+                      style: TextStyle(
+                          fontSize: 16.sp, fontWeight: FontWeight.bold)),
                   SizedBox(height: 12.h),
-                  GridView.builder(
-                    itemCount: 4,
-                    shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      mainAxisSpacing: 16.h,
-                      crossAxisSpacing: 16.w,
-                      childAspectRatio: 0.7,
-                    ),
-                    itemBuilder: (context, index) {
-                      return dealCard(context);
-                    },
-                  )
+                  _isProductLoading
+                      ? Center(child: CircularProgressIndicator())
+                      : GridView.builder(
+                          itemCount: _products.length,
+                          shrinkWrap: true,
+                          physics: NeverScrollableScrollPhysics(),
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            mainAxisSpacing: 16.h,
+                            crossAxisSpacing: 16.w,
+                            childAspectRatio: 0.7,
+                          ),
+                          itemBuilder: (context, index) {
+                            return dealCard(context, _products[index]);
+                          },
+                        )
                 ],
               ),
             ),
           ),
-          // Support menu
           if (_showSupportMenu) ...[
             // Add a semi-transparent background for emphasis
             Positioned.fill(
@@ -249,11 +243,10 @@ class _HomePageState extends State<HomePage>
     );
   }
 
-  Widget _supportMenuItem({
-    required IconData icon,
-    required String text,
-    required VoidCallback onTap,
-  }) {
+  Widget _supportMenuItem(
+      {required IconData icon,
+      required String text,
+      required VoidCallback onTap}) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -264,60 +257,56 @@ class _HomePageState extends State<HomePage>
           borderRadius: BorderRadius.circular(14),
           boxShadow: [
             BoxShadow(
-              color: Colors.black26, // Stronger shadow for emphasis
-              blurRadius: 16,
-              spreadRadius: 2,
-              offset: Offset(0, 6),
-            ),
+                color: Colors.black26,
+                blurRadius: 16,
+                spreadRadius: 2,
+                offset: Offset(0, 6)),
           ],
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              text,
-              style: TextStyle(
-                color: Color(0xFF02B91A), // green color
-                fontWeight: FontWeight.w600,
-                fontSize: 15,
-              ),
-            ),
-            Icon(icon, color: Color(0xFF02B91A)), // green color
+            Text(text,
+                style: TextStyle(
+                    color: Color(0xFF02B91A),
+                    fontWeight: FontWeight.w600,
+                    fontSize: 15)),
+            Icon(icon, color: Color(0xFF02B91A)),
           ],
         ),
       ),
     );
   }
 
-  Widget categoryItem(String imageName) {
+  Widget categoryItem(String imageBase64) {
+    final bytes = base64Decode(imageBase64);
     return Padding(
       padding: EdgeInsets.only(right: 12.w),
       child: CircleAvatar(
         radius: 30.r,
         backgroundColor: Colors.grey[200],
-        backgroundImage: AssetImage("assets/$imageName"),
+        backgroundImage: MemoryImage(bytes),
       ),
     );
   }
 
-  Widget dealCard(BuildContext context) {
+  Widget dealCard(BuildContext context, Product product) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black12,
-            blurRadius: 6.r,
-            offset: Offset(0, 2),
-          ),
+              color: Colors.black12, blurRadius: 6.r, offset: Offset(0, 2)),
         ],
       ),
       child: InkWell(
         onTap: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => ProductDetailPage()),
+            MaterialPageRoute(
+              builder: (context) => ProductDetailPage(productId: product.id),
+            ),
           );
         },
         child: Column(
@@ -325,8 +314,8 @@ class _HomePageState extends State<HomePage>
           children: [
             ClipRRect(
               borderRadius: BorderRadius.vertical(top: Radius.circular(12.r)),
-              child: Image.asset(
-                "assets/product.png",
+              child: Image.memory(
+                base64Decode(product.imageBase64),
                 height: 100.h,
                 width: double.infinity,
                 fit: BoxFit.cover,
@@ -338,32 +327,29 @@ class _HomePageState extends State<HomePage>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
-                    children: List.generate(5, (index) {
-                      return Icon(Icons.star, color: Colors.amber, size: 14.sp);
-                    }),
+                    children: List.generate(
+                      5,
+                      (index) =>
+                          Icon(Icons.star, color: Colors.amber, size: 14.sp),
+                    ),
                   ),
                   SizedBox(height: 4.h),
                   Text(
-                    "BMW Tire Valve Stem Caps - Set of 4",
-                    style: TextStyle(
-                      fontSize: 12.sp,
-                      fontWeight: FontWeight.w500,
-                    ),
+                    product.name,
+                    style:
+                        TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w500),
                     maxLines: 2,
                   ),
                   SizedBox(height: 4.h),
-                  Text(
-                    "LKR 2,000.00",
-                    style: TextStyle(fontSize: 12.sp, color: Colors.black87),
-                  ),
+                  Text("LKR ${product.price.toStringAsFixed(2)}",
+                      style: TextStyle(fontSize: 12.sp, color: Colors.black87)),
                   SizedBox(height: 4.h),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        "42 sold",
-                        style: TextStyle(fontSize: 10.sp, color: Colors.grey),
-                      ),
+                      Text("${product.sold} sold",
+                          style:
+                              TextStyle(fontSize: 10.sp, color: Colors.grey)),
                       Icon(Icons.shopping_cart,
                           color: Colors.green, size: 16.sp),
                     ],
