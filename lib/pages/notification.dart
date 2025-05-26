@@ -9,7 +9,26 @@ class NotificationsPage extends StatefulWidget {
 
 class _NotificationsPageState extends State<NotificationsPage> {
   final NotificationService _notificationService = NotificationService();
-  String? _selectedType; // null for "All", "shop", or "seller"
+  String? _selectedType;
+
+  // Method to add a test notification
+  Future<void> _addTestNotification() async {
+    try {
+      await _notificationService.addNotification(
+        title: 'Test Shop',
+        subtitle: 'Test Notification',
+        type: 'shop',
+        date: DateTime.now(), // May 26, 2025, 11:58 PM IST
+      );
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Test notification added')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error adding test notification: $e')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -59,7 +78,6 @@ class _NotificationsPageState extends State<NotificationsPage> {
       ),
       body: Column(
         children: [
-          // Filter Dropdown
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: DropdownButton<String>(
@@ -87,6 +105,14 @@ class _NotificationsPageState extends State<NotificationsPage> {
               },
             ),
           ),
+          // Temporary button to add a test notification
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ElevatedButton(
+              onPressed: _addTestNotification,
+              child: const Text('Add Test Notification'),
+            ),
+          ),
           Expanded(
             child: StreamBuilder<List<Map<String, dynamic>>>(
               stream: _notificationService.getNotifications(typeFilter: _selectedType),
@@ -95,7 +121,24 @@ class _NotificationsPageState extends State<NotificationsPage> {
                   return const Center(child: CircularProgressIndicator());
                 }
                 if (snapshot.hasError) {
-                  return const Center(child: Text('Error loading notifications'));
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Error loading notifications: ${snapshot.error.toString()}',
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 10),
+                        ElevatedButton(
+                          onPressed: () {
+                            setState(() {}); // Trigger a rebuild to retry
+                          },
+                          child: const Text('Retry'),
+                        ),
+                      ],
+                    ),
+                  );
                 }
                 if (!snapshot.hasData || snapshot.data!.isEmpty) {
                   return const Center(child: Text('No notifications'));

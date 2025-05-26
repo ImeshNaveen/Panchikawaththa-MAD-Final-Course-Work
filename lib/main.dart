@@ -9,22 +9,26 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
-final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   print('Handling a background message: ${message.messageId}');
 }
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load();
-  await Firebase.initializeApp();
+  try {
+    await Firebase.initializeApp();
+    print('Firebase initialized successfully');
+  } catch (e) {
+    print('Error initializing Firebase: $e');
+  }
 
-  // Firebase Messaging setup
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
-  final messaging = FirebaseMessaging.instance;
-  await messaging.requestPermission(
+  await FirebaseMessaging.instance.requestPermission(
     alert: true,
     badge: true,
     sound: true,
@@ -38,14 +42,13 @@ void main() async {
     }
   });
 
-  runApp(const MyApp());
-
-  // Listen for notification taps
   FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
     navigatorKey.currentState?.push(
       MaterialPageRoute(builder: (context) => NotificationsPage()),
     );
   });
+
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {

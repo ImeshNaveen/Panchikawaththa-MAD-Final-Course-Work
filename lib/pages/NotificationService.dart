@@ -9,7 +9,6 @@ class NotificationService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseMessaging _messaging = FirebaseMessaging.instance;
 
-  // Store a new notification and send push notification
   Future<void> addNotification({
     required String title,
     required String subtitle,
@@ -20,7 +19,6 @@ class NotificationService {
       final user = _auth.currentUser;
       if (user == null) throw Exception("User not logged in");
 
-      // Store notification in Firestore
       final docRef = await _firestore
           .collection('users')
           .doc(user.uid)
@@ -33,10 +31,8 @@ class NotificationService {
         'isRead': false,
       });
 
-      // Get user's FCM token
       final token = await _messaging.getToken();
       if (token != null) {
-        // Send push notification
         await _sendPushNotification(
           token: token,
           title: title,
@@ -49,14 +45,13 @@ class NotificationService {
     }
   }
 
-  // Send push notification via FCM
   Future<void> _sendPushNotification({
     required String token,
     required String title,
     required String body,
     required String notificationId,
   }) async {
-    const String serverKey = 'YOUR_FCM_SERVER_KEY'; // Replace with your FCM server key
+    const String serverKey = 'YOUR_FCM_SERVER_KEY';
     const String fcmUrl = 'https://fcm.googleapis.com/fcm/send';
 
     final payload = {
@@ -86,22 +81,26 @@ class NotificationService {
     }
   }
 
-  // Retrieve notifications for the current user
   Stream<List<Map<String, dynamic>>> getNotifications({String? typeFilter}) {
     final user = _auth.currentUser;
-    if (user == null) return Stream.value([]);
-
-    Query<Map<String, dynamic>> query = _firestore
-        .collection('users')
-        .doc(user.uid)
-        .collection('notifications')
-        .orderBy('date', descending: true);
-
-    if (typeFilter != null) {
-      query = query.where('type', isEqualTo: typeFilter);
+    if (user == null) {
+      print('No user logged in, returning empty stream');
+      return Stream.value([]);
     }
 
-    return query.snapshots().map((snapshot) => snapshot.docs.map((doc) {
+    try {
+      Query<Map<String, dynamic>> query = _firestore
+          .collection('users')
+          .doc(user.uid)
+          .collection('notifications')
+          .orderBy('date', descending: true);
+
+      if (typeFilter != null) {
+        query = query.where('type', isEqualTo: typeFilter);
+      }
+
+      return query.snapshots().map((snapshot) {
+        return snapshot.docs.map((doc) {
           final data = doc.data();
           return {
             'id': doc.id,
@@ -111,10 +110,17 @@ class NotificationService {
             'date': (data['date'] as Timestamp).toDate(),
             'isRead': data['isRead'],
           };
-        }).toList());
+        }).toList();
+      }).handleError((error) {
+        print('Error fetching notifications: $error');
+        throw error; // Re-throw to let StreamBuilder handle the error
+      });
+    } catch (e) {
+      print('Error setting up notifications stream: $e');
+      return Stream.error(e);
+    }
   }
 
-  // Mark a notification as read
   Future<void> markAsRead(String notificationId) async {
     try {
       final user = _auth.currentUser;
@@ -131,7 +137,6 @@ class NotificationService {
     }
   }
 
-  // Delete a notification
   Future<void> deleteNotification(String notificationId) async {
     try {
       final user = _auth.currentUser;
@@ -148,7 +153,6 @@ class NotificationService {
     }
   }
 
-  // Clear all notifications
   Future<void> clearAllNotifications() async {
     try {
       final user = _auth.currentUser;
