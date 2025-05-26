@@ -87,12 +87,21 @@ class _ManageProductsPageState extends State<ManageProductsPage> {
       BuildContext context, String? id, Map<String, dynamic>? data) {
     final _formKey = GlobalKey<FormState>();
     String name = data?['name'] ?? '';
+    String category = data?['category'] ?? 'Tyer';
     String description = data?['description'] ?? '';
     String price = data?['price']?.toString() ?? '';
     String stock = data?['stock']?.toString() ?? '';
-    String sold = data?['sold']?.toString() ?? '0';
-    String rating = data?['rating']?.toString() ?? '0.0';
     _base64Image = data?['imageBase64'] ?? '';
+
+    List<String> categories = [
+      'Tyer',
+      'Brake Pad',
+      'Battery',
+      'Engine Oil',
+      'Air Filter',
+      'Spark Plug',
+      'Wiper Blade'
+    ];
 
     showDialog(
       context: context,
@@ -154,18 +163,19 @@ class _ManageProductsPageState extends State<ManageProductsPage> {
                                 : null,
                         onSaved: (value) => stock = value!.trim(),
                       ),
-                      TextFormField(
-                        initialValue: sold,
-                        decoration: const InputDecoration(labelText: 'Sold'),
-                        keyboardType: TextInputType.number,
-                        onSaved: (value) => sold = value?.trim() ?? '0',
-                      ),
-                      TextFormField(
-                        initialValue: rating,
-                        decoration: const InputDecoration(labelText: 'Rating'),
-                        keyboardType:
-                            TextInputType.numberWithOptions(decimal: true),
-                        onSaved: (value) => rating = value?.trim() ?? '0.0',
+                      DropdownButtonFormField<String>(
+                        value: category,
+                        items: categories
+                            .map((cat) => DropdownMenuItem(
+                                  value: cat,
+                                  child: Text(cat),
+                                ))
+                            .toList(),
+                        decoration:
+                            const InputDecoration(labelText: 'Category'),
+                        onChanged: (value) =>
+                            setStateDialog(() => category = value ?? ''),
+                        onSaved: (value) => category = value ?? '',
                       ),
                       const SizedBox(height: 10),
                       _base64Image != null && _base64Image!.isNotEmpty
@@ -199,8 +209,7 @@ class _ManageProductsPageState extends State<ManageProductsPage> {
                         'description': description,
                         'price': double.parse(price),
                         'stock': int.parse(stock),
-                        'sold': int.parse(sold),
-                        'rating': double.parse(rating),
+                        'category': category,
                         'imageBase64': _base64Image ?? '',
                         'sellerId': userId,
                       };
