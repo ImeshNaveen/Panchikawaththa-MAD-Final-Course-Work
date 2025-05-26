@@ -4,8 +4,8 @@ import 'package:panchikawaththa/pages/profile_page.dart';
 import 'home_page.dart';
 import 'cart_page.dart';
 import 'search.dart';
-import 'wishlist_page.dart';
 import 'account_details.dart';
+import 'manage_products_page.dart'; // <-- Import this
 
 class MainLayout extends StatefulWidget {
   const MainLayout({super.key});
@@ -20,8 +20,8 @@ class _MainLayoutState extends State<MainLayout> {
   final List<Widget> _pages = [
     HomePage(),
     CartPage(),
+    Container(), // Placeholder for center "+" icon, not a page
     SearchPage(),
-    WishlistPage(),
     Profilepage(),
   ];
 
@@ -50,13 +50,24 @@ class _MainLayoutState extends State<MainLayout> {
                 index: 1,
                 activeColor: Color(0xFF02B91A),
               ),
-              navItem(
-                icon: Icons.search,
-                index: 2,
-                activeColor: Color(0xFF02B91A),
+              // Center Add button
+              IconButton(
+                icon: Icon(
+                  Icons.add_circle_outline,
+                  size: 36.sp,
+                  color: Colors.white,
+                ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ManageProductsPage(),
+                    ),
+                  );
+                },
               ),
               navItem(
-                icon: Icons.favorite_border,
+                icon: Icons.search,
                 index: 3,
                 activeColor: Color(0xFF02B91A),
               ),

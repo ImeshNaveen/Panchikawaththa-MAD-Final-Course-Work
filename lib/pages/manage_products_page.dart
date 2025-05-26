@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class ManageProductsPage extends StatefulWidget {
   const ManageProductsPage({super.key});
@@ -182,12 +183,17 @@ class _ManageProductsPageState extends State<ManageProductsPage> {
               ),
               actions: [
                 TextButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    child: const Text('Cancel')),
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('Cancel'),
+                ),
                 ElevatedButton(
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
                       _formKey.currentState!.save();
+
+                      final currentUser = FirebaseAuth.instance.currentUser;
+                      final userId = currentUser?.uid ?? '';
+
                       final product = {
                         'name': name,
                         'description': description,
@@ -196,24 +202,29 @@ class _ManageProductsPageState extends State<ManageProductsPage> {
                         'sold': int.parse(sold),
                         'rating': double.parse(rating),
                         'imageBase64': _base64Image ?? '',
+                        'sellerId': userId,
                       };
+
                       try {
                         if (id == null) {
                           await _firestore.collection('products').add(product);
                           ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Product added')));
+                            const SnackBar(content: Text('Product added')),
+                          );
                         } else {
                           await _firestore
                               .collection('products')
                               .doc(id)
                               .update(product);
                           ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Product updated')));
+                            const SnackBar(content: Text('Product updated')),
+                          );
                         }
                         Navigator.of(context).pop();
                       } catch (e) {
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                            content: Text('Failed to save product: $e')));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Failed to save product: $e')),
+                        );
                       }
                     }
                   },
