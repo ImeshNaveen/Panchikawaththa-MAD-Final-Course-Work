@@ -92,6 +92,7 @@ class _ManageProductsPageState extends State<ManageProductsPage> {
     String stock = data?['stock']?.toString() ?? '';
     String sold = data?['sold']?.toString() ?? '0';
     String rating = data?['rating']?.toString() ?? '0.0';
+    int? selectedSold = int.tryParse(sold);
     _base64Image = data?['imageBase64'] ?? '';
 
     showDialog(
@@ -154,11 +155,25 @@ class _ManageProductsPageState extends State<ManageProductsPage> {
                                 : null,
                         onSaved: (value) => stock = value!.trim(),
                       ),
-                      TextFormField(
-                        initialValue: sold,
+                      DropdownButtonFormField<int>(
+                        value: selectedSold,
                         decoration: const InputDecoration(labelText: 'Sold'),
-                        keyboardType: TextInputType.number,
-                        onSaved: (value) => sold = value?.trim() ?? '0',
+                        items: List.generate(
+                          101,
+                          (index) => DropdownMenuItem(
+                            value: index,
+                            child: Text(index.toString()),
+                          ),
+                        ),
+                        onChanged: (value) {
+                          setStateDialog(() {
+                            selectedSold = value;
+                          });
+                        },
+                        validator: (value) => value == null
+                            ? 'Please select number of sold items'
+                            : null,
+                        onSaved: (value) => sold = value.toString(),
                       ),
                       TextFormField(
                         initialValue: rating,
