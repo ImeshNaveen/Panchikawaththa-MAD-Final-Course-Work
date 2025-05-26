@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class ChatBotPage extends StatefulWidget {
   const ChatBotPage({super.key});
@@ -11,14 +13,51 @@ class _ChatBotPageState extends State<ChatBotPage> {
   final TextEditingController _controller = TextEditingController();
   final List<Map<String, String>> _messages = [];
 
-  void _sendMessage() {
+  // Paste your Hugging Face API key here:
+  final String huggingFaceApiKey = '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';
+
+  Future<void> _sendMessage() async {
     final message = _controller.text.trim();
-    if (message.isNotEmpty) {
-      setState(() {
-        _messages.add({"user": message});
-        _messages.add({"bot": "This is a bot response to: \"$message\""});
-      });
-      _controller.clear();
+    if (message.isEmpty) return;
+
+    setState(() {
+      _messages.add({"user": message});
+    });
+
+    _controller.clear();
+
+    final response = await _getBotReply(message);
+
+    setState(() {
+      _messages.add({"bot": response});
+    });
+  }
+
+  Future<String> _getBotReply(String userMessage) async {
+    const url =
+        'https://api-inference.huggingface.co/models/microsoft/DialoGPT-medium';
+
+    final response = await http.post(
+      Uri.parse(url),
+      headers: {
+        'Authorization': 'Bearer $huggingFaceApiKey',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({"inputs": userMessage}),
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      if (data != null &&
+          data is List &&
+          data.isNotEmpty &&
+          data[0]['generated_text'] != null) {
+        return data[0]['generated_text'].toString().trim();
+      } else {
+        return 'Bot could not understand.';
+      }
+    } else {
+      return 'Error: ${response.statusCode}';
     }
   }
 

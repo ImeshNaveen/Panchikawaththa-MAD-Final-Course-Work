@@ -1,12 +1,68 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'login_page.dart';
 
-class SignUpPage extends StatelessWidget {
+class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
 
   @override
+  State<SignUpPage> createState() => _SignUpPageState();
+}
+
+class _SignUpPageState extends State<SignUpPage> {
+  Color myGreenColor = const Color(0xFF02B91A);
+
+  // Firebase controllers
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmController = TextEditingController();
+
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  bool _isLoading = false;
+
+  void _signUp() async {
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
+    final confirm = _confirmController.text.trim();
+
+    if (password != confirm) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Passwords do not match")),
+      );
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    try {
+      await _auth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Account created successfully")),
+      );
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const LoginPage()),
+      );
+    } on FirebaseAuthException catch (e) {
+      String msg = "Sign up failed";
+      if (e.code == 'email-already-in-use')
+        msg = "Email already in use";
+      else if (e.code == 'weak-password')
+        msg = "Weak password";
+      else if (e.code == 'invalid-email') msg = "Invalid email";
+
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    Color myGreenColor = Color(0xFF02B91A);
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
@@ -23,27 +79,23 @@ class SignUpPage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(height: 80),
+                const SizedBox(height: 80),
                 Padding(
-                  padding: EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(20),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "SignUp",
-                        style: TextStyle(color: Colors.white, fontSize: 40),
-                      ),
+                    children: const [
+                      Text("SignUp",
+                          style: TextStyle(color: Colors.white, fontSize: 40)),
                       SizedBox(height: 10),
-                      Text(
-                        "Register your account",
-                        style: TextStyle(color: Colors.white, fontSize: 18),
-                      ),
+                      Text("Register your account",
+                          style: TextStyle(color: Colors.white, fontSize: 18)),
                     ],
                   ),
                 ),
-                SizedBox(height: 30),
+                const SizedBox(height: 30),
                 Container(
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(60),
@@ -51,221 +103,66 @@ class SignUpPage extends StatelessWidget {
                     ),
                   ),
                   child: Padding(
-                    padding: EdgeInsets.all(20),
+                    padding: const EdgeInsets.all(20),
                     child: Column(
                       children: [
-                        SizedBox(height: 60),
-                        Container(
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(30),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.green[200]!,
-                                blurRadius: 20,
-                                offset: Offset(0, 10),
-                              ),
-                            ],
-                          ),
-                          child: Column(
-                            children: [
-                              Container(
-                                padding: EdgeInsets.all(8),
-                                child: TextField(
-                                  decoration: InputDecoration(
-                                    hintText: "First Name",
-                                    hintStyle: TextStyle(color: Colors.grey),
-                                    border: InputBorder.none,
-                                    contentPadding: EdgeInsets.only(left: 10),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(height: 20),
-                        Container(
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(30),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.green[200]!,
-                                blurRadius: 20,
-                                offset: Offset(0, 10),
-                              ),
-                            ],
-                          ),
-                          child: Column(
-                            children: [
-                              Container(
-                                padding: EdgeInsets.all(8),
-                                child: TextField(
-                                  decoration: InputDecoration(
-                                    hintText: "Last Name",
-                                    hintStyle: TextStyle(color: Colors.grey),
-                                    border: InputBorder.none,
-                                    contentPadding: EdgeInsets.only(left: 10),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(height: 20),
-                        Container(
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(30),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.green[200]!,
-                                blurRadius: 20,
-                                offset: Offset(0, 10),
-                              ),
-                            ],
-                          ),
-                          child: Column(
-                            children: [
-                              Container(
-                                padding: EdgeInsets.all(8),
-                                child: TextField(
-                                  decoration: InputDecoration(
-                                    hintText: "Email",
-                                    hintStyle: TextStyle(color: Colors.grey),
-                                    border: InputBorder.none,
-                                    contentPadding: EdgeInsets.only(left: 10),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(height: 20),
-                        Container(
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(30),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.green[200]!,
-                                blurRadius: 20,
-                                offset: Offset(0, 10),
-                              ),
-                            ],
-                          ),
-                          child: Column(
-                            children: [Container(child: PasswordField())],
-                          ),
-                        ),
-                        SizedBox(height: 20),
-                        Container(
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(30),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.green[200]!,
-                                blurRadius: 20,
-                                offset: Offset(0, 10),
-                              ),
-                            ],
-                          ),
-                          child: Column(
-                            children: [
-                              Container(child: ConfirmPasswordField()),
-                            ],
-                          ),
-                        ),
-                        SizedBox(height: 40),
-                        Text(
+                        const SizedBox(height: 60),
+                        _buildInput("First Name"),
+                        const SizedBox(height: 20),
+                        _buildInput("Last Name"),
+                        const SizedBox(height: 20),
+                        _buildInput("Email", controller: _emailController),
+                        const SizedBox(height: 20),
+                        PasswordField(controller: _passwordController),
+                        const SizedBox(height: 20),
+                        ConfirmPasswordField(controller: _confirmController),
+                        const SizedBox(height: 40),
+                        const Text(
                           "Fill those details to create an account.",
                           style: TextStyle(color: Colors.grey),
                         ),
-                        SizedBox(height: 25),
+                        const SizedBox(height: 25),
                         ElevatedButton(
-                          onPressed: () {
-                            // TODO: Handle Sign Up button press
-                            print("Sign Up button clicked!");
-                          },
+                          onPressed: _isLoading ? null : _signUp,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Color(
-                              0xFF02B91A,
-                            ), // Custom Green Color
+                            backgroundColor: const Color(0xFF02B91A),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(
-                                30,
-                              ), // Rounded edges
+                              borderRadius: BorderRadius.circular(30),
                             ),
-                            padding: EdgeInsets.symmetric(
+                            padding: const EdgeInsets.symmetric(
                               horizontal: 60,
                               vertical: 15,
                             ),
                           ),
-                          child: Text(
-                            "Sign Up",
-                            style: TextStyle(fontSize: 18, color: Colors.white),
-                          ),
+                          child: _isLoading
+                              ? const CircularProgressIndicator(
+                                  color: Colors.white,
+                                )
+                              : const Text("Sign Up",
+                                  style: TextStyle(
+                                      fontSize: 18, color: Colors.white)),
                         ),
-                        SizedBox(height: 20),
-                        Text(
-                          "or SignUp with",
-                          style: TextStyle(color: Colors.grey),
-                        ),
-                        SizedBox(height: 15),
-                        // Social Media Sign-In Buttons
+                        const SizedBox(height: 20),
+                        const Text("or SignUp with",
+                            style: TextStyle(color: Colors.grey)),
+                        const SizedBox(height: 15),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            // Facebook Button
-                            GestureDetector(
-                              onTap: () {
-                                print("Facebook Sign-In clicked!");
-                              },
-                              child: SizedBox(
-                                width: 40, // Set icon width
-                                height: 40, // Set icon height
-                                child: Image.asset("assets/facebook.png"),
-                              ),
-                            ),
-
-                            SizedBox(width: 15), // Reduce spacing
-                            // Google (Gmail) Button
-                            GestureDetector(
-                              onTap: () {
-                                print("Google Sign-In clicked!");
-                              },
-                              child: SizedBox(
-                                width: 40,
-                                height: 40,
-                                child: Image.asset("assets/google.png"),
-                              ),
-                            ),
-
-                            SizedBox(width: 15),
-
-                            // iCloud Button
-                            GestureDetector(
-                              onTap: () {
-                                print("iCloud Sign-In clicked!");
-                              },
-                              child: SizedBox(
-                                width: 40,
-                                height: 40,
-                                child: Image.asset("assets/apple.png"),
-                              ),
-                            ),
+                            _socialIcon("assets/facebook.png"),
+                            const SizedBox(width: 15),
+                            _socialIcon("assets/google.png"),
+                            const SizedBox(width: 15),
+                            _socialIcon("assets/apple.png"),
                           ],
                         ),
-                        SizedBox(height: 10),
+                        const SizedBox(height: 10),
                         TextButton(
                           onPressed: () {
-                            // Navigate to Sign In page
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => LoginPage(),
-                              ),
+                                  builder: (context) => const LoginPage()),
                             );
                           },
                           child: Text(
@@ -284,21 +181,67 @@ class SignUpPage extends StatelessWidget {
       ),
     );
   }
+
+  Widget _buildInput(String hint, {TextEditingController? controller}) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(30),
+        boxShadow: [
+          BoxShadow(
+              color: Colors.green[200]!,
+              blurRadius: 20,
+              offset: const Offset(0, 10))
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(8),
+        child: TextField(
+          controller: controller,
+          decoration: InputDecoration(
+            hintText: hint,
+            hintStyle: const TextStyle(color: Colors.grey),
+            border: InputBorder.none,
+            contentPadding: const EdgeInsets.only(left: 10),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _socialIcon(String path) {
+    return GestureDetector(
+      onTap: () {
+        print("$path Sign-In clicked!");
+      },
+      child: SizedBox(
+        width: 40,
+        height: 40,
+        child: Image.asset(path),
+      ),
+    );
+  }
 }
 
-// Password Field with Show/Hide Toggle
+// Reuse your existing password widgets with minor changes to accept controllers
+
 class PasswordField extends StatefulWidget {
-  const PasswordField({super.key});
+  final TextEditingController controller;
+  const PasswordField({super.key, required this.controller});
 
   @override
-  _PasswordFieldState createState() => _PasswordFieldState();
+  State<PasswordField> createState() => _PasswordFieldState();
 }
 
 class _PasswordFieldState extends State<PasswordField> {
-  bool _isObscured = true; // Initially hide password
+  bool _isObscured = true;
 
   @override
   Widget build(BuildContext context) {
+    return _buildPasswordField("Password", widget.controller);
+  }
+
+  Widget _buildPasswordField(String hint, TextEditingController controller) {
     return Container(
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
@@ -306,31 +249,26 @@ class _PasswordFieldState extends State<PasswordField> {
         borderRadius: BorderRadius.circular(30),
         boxShadow: [
           BoxShadow(
-            color: Colors.green[200]!,
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          ),
+              color: Colors.green[200]!,
+              blurRadius: 20,
+              offset: const Offset(0, 10))
         ],
       ),
       child: TextField(
-        obscureText: _isObscured, // Toggle password visibility
+        controller: controller,
+        obscureText: _isObscured,
         decoration: InputDecoration(
-          hintText: "Password",
+          hintText: hint,
           hintStyle: const TextStyle(color: Colors.grey),
           border: InputBorder.none,
-          contentPadding: EdgeInsets.only(
-            left: 10,
-            top: 9,
-          ), // Added contentPadding
+          contentPadding: const EdgeInsets.only(left: 10, top: 9),
           suffixIcon: IconButton(
             icon: Icon(
               _isObscured ? Icons.visibility : Icons.visibility_off,
               color: Colors.grey,
             ),
             onPressed: () {
-              setState(() {
-                _isObscured = !_isObscured; // Toggle obscureText
-              });
+              setState(() => _isObscured = !_isObscured);
             },
           ),
         ),
@@ -339,19 +277,23 @@ class _PasswordFieldState extends State<PasswordField> {
   }
 }
 
-// Confirm Password Field with Show/Hide Toggle
 class ConfirmPasswordField extends StatefulWidget {
-  const ConfirmPasswordField({super.key});
+  final TextEditingController controller;
+  const ConfirmPasswordField({super.key, required this.controller});
 
   @override
-  _ConfirmPasswordFieldState createState() => _ConfirmPasswordFieldState();
+  State<ConfirmPasswordField> createState() => _ConfirmPasswordFieldState();
 }
 
 class _ConfirmPasswordFieldState extends State<ConfirmPasswordField> {
-  bool _isObscured = true; // Initially hide password
+  bool _isObscured = true;
 
   @override
   Widget build(BuildContext context) {
+    return _buildPasswordField("Confirm Password", widget.controller);
+  }
+
+  Widget _buildPasswordField(String hint, TextEditingController controller) {
     return Container(
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
@@ -359,31 +301,26 @@ class _ConfirmPasswordFieldState extends State<ConfirmPasswordField> {
         borderRadius: BorderRadius.circular(30),
         boxShadow: [
           BoxShadow(
-            color: Colors.green[200]!,
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          ),
+              color: Colors.green[200]!,
+              blurRadius: 20,
+              offset: const Offset(0, 10))
         ],
       ),
       child: TextField(
-        obscureText: _isObscured, // Toggle password visibility
+        controller: controller,
+        obscureText: _isObscured,
         decoration: InputDecoration(
-          hintText: "Confirm Password",
+          hintText: hint,
           hintStyle: const TextStyle(color: Colors.grey),
           border: InputBorder.none,
-          contentPadding: EdgeInsets.only(
-            left: 10,
-            top: 9,
-          ), // Added contentPadding
+          contentPadding: const EdgeInsets.only(left: 10, top: 9),
           suffixIcon: IconButton(
             icon: Icon(
               _isObscured ? Icons.visibility : Icons.visibility_off,
               color: Colors.grey,
             ),
             onPressed: () {
-              setState(() {
-                _isObscured = !_isObscured; // Toggle obscureText
-              });
+              setState(() => _isObscured = !_isObscured);
             },
           ),
         ),
