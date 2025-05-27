@@ -1,118 +1,96 @@
 import 'package:flutter/material.dart';
-
-void main() {
-  runApp(MaterialApp(home: NotificationsPage()));
-}
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class NotificationsPage extends StatelessWidget {
-  final List<Map<String, String>> notifications = [
-    {
-      "title": "Shop100970818 store",
-      "subtitle": "Order Confirmed",
-      "date": "17/09",
-      "type": "shop"
-    },
-    {
-      "title": "Shop498764042 store",
-      "subtitle": "Order Confirmed",
-      "date": "10/09",
-      "type": "shop"
-    },
-    {
-      "title": "Shop106782349240 store",
-      "subtitle": "Order Confirmed",
-      "date": "09/09",
-      "type": "shop"
-    },
-    {
-      "title": "seller 342211",
-      "subtitle": "yes !",
-      "date": "04/09",
-      "type": "seller"
-    },
-    {
-      "title": "Shop100544343 store",
-      "subtitle": "Order Confirmed",
-      "date": "04/09",
-      "type": "shop"
-    },
-    {
-      "title": "seller 534232445",
-      "subtitle": "Order Confirmed",
-      "date": "01/09",
-      "type": "seller"
-    },
-    {
-      "title": "Shop100970818 store",
-      "subtitle": "Order Confirmed",
-      "date": "24/08",
-      "type": "shop"
-    },
-    {
-      "title": "Shop100970818 store",
-      "subtitle": "Order Confirmed",
-      "date": "17/09",
-      "type": "shop"
-    },
-  ];
+  const NotificationsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text('Notifications',
-              style: TextStyle(fontWeight: FontWeight.bold)),
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back_ios),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-          actions: [
-            IconButton(
-                icon: Icon(Icons.cleaning_services_outlined), onPressed: () {})
-          ],
-          backgroundColor: Colors.white,
-          foregroundColor: Colors.black,
-          elevation: 0,
-        ),
-        body: ListView.separated(
-          padding: EdgeInsets.all(8),
-          itemCount: notifications.length,
-          separatorBuilder: (context, index) => SizedBox(height: 10),
-          itemBuilder: (context, index) {
-            final item = notifications[index];
-            return Container(
-              padding: EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Color(0xFFF4F4F4),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Row(
-                children: [
-                  Icon(
-                    item['type'] == 'shop' ? Icons.storefront : Icons.person,
-                    size: 36,
-                  ),
-                  SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(item['title']!,
-                            style: TextStyle(fontWeight: FontWeight.bold)),
-                        SizedBox(height: 4),
-                        Text(item['subtitle']!,
-                            style: TextStyle(color: Colors.grey[600])),
-                      ],
-                    ),
-                  ),
-                  Text(item['date']!,
-                      style: TextStyle(color: Colors.grey[600])),
-                ],
-              ),
-            );
+      appBar: AppBar(
+        title: Text('Notifications',
+            style: TextStyle(fontWeight: FontWeight.bold)),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_ios),
+          onPressed: () {
+            Navigator.pop(context);
           },
-        ));
+        ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.cleaning_services_outlined),
+            onPressed: () {
+              // Add logic to clear notifications if needed
+            },
+          )
+        ],
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black,
+        elevation: 0,
+      ),
+      body: StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection('notifications')
+            .orderBy('date', descending: true) // optional
+            .snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            // Loading state
+            return Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            // Error state
+            return Center(child: Text('Error loading notifications'));
+          } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+            // No data state
+            return Center(child: Text('No notifications'));
+          }
+
+          final notifications = snapshot.data!.docs;
+
+          return ListView.separated(
+            padding: EdgeInsets.all(8),
+            itemCount: notifications.length,
+            separatorBuilder: (context, index) => SizedBox(height: 10),
+            itemBuilder: (context, index) {
+              final doc = notifications[index];
+              final title = doc['title'] ?? 'No title';
+              final subtitle = doc['subtitle'] ?? '';
+              final date = doc['date'] ?? '';
+              final type = doc['type'] ?? 'shop';
+
+              return Container(
+                padding: EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Color(0xFFF4F4F4),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      type == 'shop' ? Icons.storefront : Icons.person,
+                      size: 36,
+                    ),
+                    SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(title,
+                              style: TextStyle(fontWeight: FontWeight.bold)),
+                          SizedBox(height: 4),
+                          Text(subtitle,
+                              style: TextStyle(color: Colors.grey[600])),
+                        ],
+                      ),
+                    ),
+                    Text(date, style: TextStyle(color: Colors.grey[600])),
+                  ],
+                ),
+              );
+            },
+          );
+        },
+      ),
+    );
   }
 }

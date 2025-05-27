@@ -1,6 +1,12 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 class ReviewForm extends StatefulWidget {
+  final String productId;
+
+  const ReviewForm({super.key, required this.productId});
+
   @override
   _ReviewFormState createState() => _ReviewFormState();
 }
@@ -8,22 +14,58 @@ class ReviewForm extends StatefulWidget {
 class _ReviewFormState extends State<ReviewForm> {
   int _rating = 0;
   final TextEditingController _controller = TextEditingController();
+  bool _isSubmitting = false;
 
-  void _submitReview() {
-    Navigator.pop(context); // Close the bottom sheet
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.check_circle, color: Colors.green, size: 40),
-            SizedBox(height: 10),
-            Text("Done", style: TextStyle(fontSize: 20)),
-          ],
-        ),
-      ),
+  Future<void> _submitReview() async {
+    if (_rating == 0 || _controller.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Please provide both rating and comment")),
+      );
+      return;
+    }
+
+    setState(() {
+      _isSubmitting = true;
+    });
+
+    final reviewData = {
+      "productId": widget.productId,
+      "stars": _rating,
+      "review": _controller.text.trim(),
+      "name": "Anonymous", // You can replace this with user data
+      "date": DateTime.now().toIso8601String()
+    };
+
+    final response = await http.post(
+      Uri.parse("https://your-api-url.com/reviews"),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode(reviewData),
     );
+
+    setState(() {
+      _isSubmitting = false;
+    });
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      Navigator.pop(context); // Close bottom sheet
+      showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.check_circle, color: Colors.green, size: 40),
+              SizedBox(height: 10),
+              Text("Review Submitted", style: TextStyle(fontSize: 20)),
+            ],
+          ),
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Failed to submit review. Try again later.")),
+      );
+    }
   }
 
   @override
@@ -66,12 +108,17 @@ class _ReviewFormState extends State<ReviewForm> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: Color(0xFF02B91A),
               ),
-              onPressed: _submitReview,
-              child: Text('SEND REVIEW',
-                  style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white)),
+              onPressed: _isSubmitting ? null : _submitReview,
+              child: _isSubmitting
+                  ? CircularProgressIndicator(color: Colors.white)
+                  : Text(
+                      'SEND REVIEW',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
             ),
           ],
         ),

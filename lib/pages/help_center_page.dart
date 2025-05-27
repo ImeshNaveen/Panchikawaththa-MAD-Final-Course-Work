@@ -9,15 +9,7 @@ class HelpCenterPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Help Center',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        fontFamily: 'SF Pro Text',
-      ),
-      home: const HelpCenterScreen(),
-    );
+    return HelpCenterScreen();
   }
 }
 
@@ -31,7 +23,12 @@ class HelpCenterScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: const BackButton(color: Colors.black),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () {
+            Navigator.of(context).pop(); // Go back to previous screen
+          },
+        ),
         title: const Text(
           'Help Center',
           style: TextStyle(

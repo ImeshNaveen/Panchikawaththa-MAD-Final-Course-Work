@@ -3,6 +3,7 @@ import 'package:panchikawaththa/pages/help_center_page.dart';
 import 'package:panchikawaththa/pages/login_page.dart';
 import 'package:panchikawaththa/pages/return_details_page.dart';
 import 'package:panchikawaththa/pages/save_card_page.dart';
+import 'package:panchikawaththa/pages/setting_page.dart';
 import 'package:panchikawaththa/pages/store_coupon_page.dart';
 
 class AccountDetails extends StatefulWidget {
@@ -29,8 +30,16 @@ class _AccountDetailsState extends State<AccountDetails> {
       appBar: AppBar(
         title: const Text('Account'),
         centerTitle: false,
-        actions: const [
-          Icon(Icons.settings),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.settings),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => SettingPage()),
+              );
+            },
+          ),
           SizedBox(width: 16),
           Icon(Icons.notifications_none),
           SizedBox(width: 16),
