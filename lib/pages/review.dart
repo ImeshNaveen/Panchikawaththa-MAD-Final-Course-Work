@@ -1,10 +1,12 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:panchikawaththa/models/Review_Model.dart';
 import 'ReviewForm.dart';
+import 'review.dart';
 
 class ReviewsPage extends StatefulWidget {
   final String productId;
+
   const ReviewsPage({super.key, required this.productId});
 
   @override
@@ -12,16 +14,9 @@ class ReviewsPage extends StatefulWidget {
 }
 
 class _ReviewsPageState extends State<ReviewsPage> {
-  List<dynamic> reviews = [];
+  List<Review> reviews = [];
   bool isLoading = true;
-
-  Map<int, int> ratingCount = {
-    5: 0,
-    4: 0,
-    3: 0,
-    2: 0,
-    1: 0,
-  };
+  Map<int, int> ratingCount = {5: 0, 4: 0, 3: 0, 2: 0, 1: 0};
 
   @override
   void initState() {
@@ -30,36 +25,32 @@ class _ReviewsPageState extends State<ReviewsPage> {
   }
 
   Future<void> fetchReviews() async {
-    final response = await http.get(
-      Uri.parse(
-          'https://your-api-url.com/reviews?productId=${widget.productId}'),
-    );
+    try {
+      final snapshot = await FirebaseFirestore.instance
+          .collection('reviews')
+          .where('productId', isEqualTo: widget.productId)
+          .orderBy('date', descending: true)
+          .get();
 
-    if (response.statusCode == 200) {
-      final List<dynamic> data = jsonDecode(response.body);
-
-      // Optional: If API does not support filtering, filter manually here
-      // final filteredData = data.where((review) => review['productId'] == widget.productId).toList();
+      final data = snapshot.docs
+          .map((doc) => Review.fromFirestore(doc.data(), doc.id))
+          .toList();
 
       setState(() {
         reviews = data;
         calculateRatingCounts();
         isLoading = false;
       });
-    } else {
-      setState(() {
-        isLoading = false;
-      });
+    } catch (e) {
+      print("Error fetching reviews: $e");
+      setState(() => isLoading = false);
     }
   }
 
   void calculateRatingCounts() {
     ratingCount = {5: 0, 4: 0, 3: 0, 2: 0, 1: 0};
     for (var review in reviews) {
-      int stars = review['stars'] ?? 0;
-      if (ratingCount.containsKey(stars)) {
-        ratingCount[stars] = ratingCount[stars]! + 1;
-      }
+      ratingCount[review.stars] = (ratingCount[review.stars] ?? 0) + 1;
     }
   }
 
@@ -80,7 +71,7 @@ class _ReviewsPageState extends State<ReviewsPage> {
       context: context,
       isScrollControlled: true,
       builder: (_) => ReviewForm(productId: widget.productId),
-    );
+    ).then((_) => fetchReviews());
   }
 
   Widget _buildRatingBar(int stars, int count) {
@@ -149,20 +140,20 @@ class _ReviewsPageState extends State<ReviewsPage> {
                         final review = reviews[index];
                         return ListTile(
                           leading: CircleAvatar(child: Icon(Icons.person)),
-                          title: Text(review['name'] ?? 'Anonymous'),
+                          title: Text(review.name),
                           subtitle: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Row(
                                 children: List.generate(
-                                  review['stars'] ?? 0,
+                                  review.stars,
                                   (_) => Icon(Icons.star,
                                       size: 16, color: Colors.orange),
                                 ),
                               ),
                               SizedBox(height: 4),
-                              Text(review['review'] ?? ''),
-                              Text(review['date'] ?? '',
+                              Text(review.review),
+                              Text(review.date.toLocal().toString(),
                                   style: TextStyle(fontSize: 12)),
                             ],
                           ),

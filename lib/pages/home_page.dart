@@ -198,10 +198,6 @@ class _HomePageState extends State<HomePage>
                         Text('Today Hot Deals',
                             style: TextStyle(
                                 fontSize: 16.sp, fontWeight: FontWeight.bold)),
-                        IconButton(
-                          icon: Icon(Icons.refresh, size: 20.sp),
-                          onPressed: _refreshProducts,
-                        ),
                       ],
                     ),
                     SizedBox(height: 12.h),
