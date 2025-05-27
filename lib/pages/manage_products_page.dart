@@ -106,142 +106,149 @@ class _ManageProductsPageState extends State<ManageProductsPage> {
     showDialog(
       context: context,
       builder: (context) {
-        return StatefulBuilder(
-          builder: (context, setStateDialog) {
-            Future<void> _pickImage() async {
-              final picker = ImagePicker();
-              final pickedFile = await picker.pickImage(
-                  source: ImageSource.gallery, imageQuality: 70);
-              if (pickedFile != null) {
-                final bytes = await pickedFile.readAsBytes();
-                setStateDialog(() {
-                  _base64Image = base64Encode(bytes);
-                });
-              }
-            }
+        return Dialog(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            width: 300,
+            child: Form(
+              key: _formKey,
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Center(
+                        child: Text('Add Product',
+                            style: TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold))),
+                    const SizedBox(height: 10),
+                    TextFormField(
+                      initialValue: name,
+                      decoration:
+                          const InputDecoration(labelText: 'Product Name'),
+                      validator: (value) =>
+                          value == null || value.isEmpty ? 'Enter name' : null,
+                      onSaved: (value) => name = value!.trim(),
+                    ),
+                    TextFormField(
+                      initialValue: description,
+                      decoration:
+                          const InputDecoration(labelText: 'Description'),
+                      onSaved: (value) => description = value?.trim() ?? '',
+                    ),
+                    TextFormField(
+                      initialValue: price,
+                      decoration: const InputDecoration(labelText: 'Price'),
+                      keyboardType: TextInputType.number,
+                      validator: (value) =>
+                          value == null || double.tryParse(value) == null
+                              ? 'Enter valid price'
+                              : null,
+                      onSaved: (value) => price = value!.trim(),
+                    ),
+                    TextFormField(
+                      initialValue: stock,
+                      decoration: const InputDecoration(labelText: 'Stock'),
+                      keyboardType: TextInputType.number,
+                      validator: (value) =>
+                          value == null || int.tryParse(value) == null
+                              ? 'Enter valid stock'
+                              : null,
+                      onSaved: (value) => stock = value!.trim(),
+                    ),
+                    const SizedBox(height: 10),
+                    const Text('Category', style: TextStyle(fontSize: 12)),
+                    DropdownButtonFormField<String>(
+                      value: category,
+                      items: categories
+                          .map((cat) =>
+                              DropdownMenuItem(value: cat, child: Text(cat)))
+                          .toList(),
+                      onChanged: (value) => category = value ?? 'Tyer',
+                      onSaved: (value) => category = value ?? 'Tyer',
+                    ),
+                    const SizedBox(height: 10),
+                    _base64Image != null && _base64Image!.isNotEmpty
+                        ? Image.memory(base64Decode(_base64Image!),
+                            width: 80, height: 80, fit: BoxFit.cover)
+                        : const Text('No image selected'),
+                    TextButton.icon(
+                      onPressed: () async {
+                        final picker = ImagePicker();
+                        final pickedFile = await picker.pickImage(
+                            source: ImageSource.gallery, imageQuality: 70);
+                        if (pickedFile != null) {
+                          final bytes = await pickedFile.readAsBytes();
+                          setState(() => _base64Image = base64Encode(bytes));
+                        }
+                      },
+                      icon: const Icon(Icons.image),
+                      label: const Text('Pick Image'),
+                    ),
+                    const SizedBox(height: 10),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        TextButton(
+                          onPressed: () => Navigator.of(context).pop(),
+                          child: const Text('Cancel'),
+                        ),
+                        ElevatedButton(
+                          onPressed: () async {
+                            if (_formKey.currentState!.validate()) {
+                              _formKey.currentState!.save();
+                              final currentUser =
+                                  FirebaseAuth.instance.currentUser;
+                              final userId = currentUser?.uid ?? '';
 
-            return AlertDialog(
-              title: Text(id == null ? 'Add Product' : 'Edit Product'),
-              content: Form(
-                key: _formKey,
-                child: SingleChildScrollView(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      TextFormField(
-                        initialValue: name,
-                        decoration:
-                            const InputDecoration(labelText: 'Product Name'),
-                        validator: (value) => value == null || value.isEmpty
-                            ? 'Enter name'
-                            : null,
-                        onSaved: (value) => name = value!.trim(),
-                      ),
-                      TextFormField(
-                        initialValue: description,
-                        decoration:
-                            const InputDecoration(labelText: 'Description'),
-                        onSaved: (value) => description = value?.trim() ?? '',
-                      ),
-                      TextFormField(
-                        initialValue: price,
-                        decoration: const InputDecoration(labelText: 'Price'),
-                        keyboardType: TextInputType.number,
-                        validator: (value) =>
-                            value == null || double.tryParse(value) == null
-                                ? 'Enter valid price'
-                                : null,
-                        onSaved: (value) => price = value!.trim(),
-                      ),
-                      TextFormField(
-                        initialValue: stock,
-                        decoration: const InputDecoration(labelText: 'Stock'),
-                        keyboardType: TextInputType.number,
-                        validator: (value) =>
-                            value == null || int.tryParse(value) == null
-                                ? 'Enter valid stock'
-                                : null,
-                        onSaved: (value) => stock = value!.trim(),
-                      ),
-                      DropdownButtonFormField<String>(
-                        value: category,
-                        items: categories
-                            .map((cat) => DropdownMenuItem(
-                                  value: cat,
-                                  child: Text(cat),
-                                ))
-                            .toList(),
-                        decoration:
-                            const InputDecoration(labelText: 'Category'),
-                        onChanged: (value) =>
-                            setStateDialog(() => category = value ?? ''),
-                        onSaved: (value) => category = value ?? '',
-                      ),
-                      const SizedBox(height: 10),
-                      _base64Image != null && _base64Image!.isNotEmpty
-                          ? Image.memory(base64Decode(_base64Image!),
-                              width: 80, height: 80, fit: BoxFit.cover)
-                          : const Text('No image selected'),
-                      TextButton.icon(
-                        onPressed: _pickImage,
-                        icon: const Icon(Icons.image),
-                        label: const Text('Pick Image'),
-                      ),
-                    ],
-                  ),
+                              final product = {
+                                'name': name,
+                                'description': description,
+                                'price': double.parse(price),
+                                'stock': int.parse(stock),
+                                'category': category,
+                                'imageBase64': _base64Image ?? '',
+                                'sellerId': userId,
+                              };
+
+                              try {
+                                if (id == null) {
+                                  final docRef = await _firestore
+                                      .collection('products')
+                                      .add(product);
+                                  await docRef.update({'id': docRef.id});
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                          content: Text('Product added')));
+                                } else {
+                                  await _firestore
+                                      .collection('products')
+                                      .doc(id)
+                                      .update(product);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                          content: Text('Product updated')));
+                                }
+                                Navigator.of(context).pop();
+                              } catch (e) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                        content: Text(
+                                            'Failed to save product: $e')));
+                              }
+                            }
+                          },
+                          child: Text(id == null ? 'Add' : 'Update'),
+                        ),
+                      ],
+                    )
+                  ],
                 ),
               ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: const Text('Cancel'),
-                ),
-                ElevatedButton(
-                  onPressed: () async {
-                    if (_formKey.currentState!.validate()) {
-                      _formKey.currentState!.save();
-
-                      final currentUser = FirebaseAuth.instance.currentUser;
-                      final userId = currentUser?.uid ?? '';
-
-                      final product = {
-                        'name': name,
-                        'description': description,
-                        'price': double.parse(price),
-                        'stock': int.parse(stock),
-                        'category': category,
-                        'imageBase64': _base64Image ?? '',
-                        'sellerId': userId,
-                      };
-
-                      try {
-                        if (id == null) {
-                          await _firestore.collection('products').add(product);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Product added')),
-                          );
-                        } else {
-                          await _firestore
-                              .collection('products')
-                              .doc(id)
-                              .update(product);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Product updated')),
-                          );
-                        }
-                        Navigator.of(context).pop();
-                      } catch (e) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Failed to save product: $e')),
-                        );
-                      }
-                    }
-                  },
-                  child: Text(id == null ? 'Add' : 'Update'),
-                ),
-              ],
-            );
-          },
+            ),
+          ),
         );
       },
     );
