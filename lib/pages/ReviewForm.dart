@@ -1,6 +1,7 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:panchikawaththa/models/Review_Model.dart';
+import 'review.dart';
 
 class ReviewForm extends StatefulWidget {
   final String productId;
@@ -28,26 +29,23 @@ class _ReviewFormState extends State<ReviewForm> {
       _isSubmitting = true;
     });
 
-    final reviewData = {
-      "productId": widget.productId,
-      "stars": _rating,
-      "review": _controller.text.trim(),
-      "name": "Anonymous", // You can replace this with user data
-      "date": DateTime.now().toIso8601String()
-    };
-
-    final response = await http.post(
-      Uri.parse("https://your-api-url.com/reviews"),
-      headers: {"Content-Type": "application/json"},
-      body: jsonEncode(reviewData),
+    final review = Review(
+      id: '',
+      productId: widget.productId,
+      stars: _rating,
+      review: _controller.text.trim(),
+      name: "Anonymous",
+      date: DateTime.now(),
     );
 
-    setState(() {
-      _isSubmitting = false;
-    });
+    try {
+      await FirebaseFirestore.instance.collection('reviews').add({
+        ...review.toMap(),
+        'date': FieldValue.serverTimestamp(), // Let Firestore set accurate time
+      });
 
-    if (response.statusCode == 200 || response.statusCode == 201) {
-      Navigator.pop(context); // Close bottom sheet
+      Navigator.pop(context);
+
       showDialog(
         context: context,
         builder: (_) => AlertDialog(
@@ -61,10 +59,14 @@ class _ReviewFormState extends State<ReviewForm> {
           ),
         ),
       );
-    } else {
+    } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Failed to submit review. Try again later.")),
       );
+    } finally {
+      setState(() {
+        _isSubmitting = false;
+      });
     }
   }
 
