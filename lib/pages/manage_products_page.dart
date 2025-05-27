@@ -13,7 +13,7 @@ class ManageProductsPage extends StatefulWidget {
 
 class _ManageProductsPageState extends State<ManageProductsPage> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  String? _base64Image;
+  List<String> _base64Images = [];
 
   @override
   Widget build(BuildContext context) {
@@ -22,14 +22,17 @@ class _ManageProductsPageState extends State<ManageProductsPage> {
       body: StreamBuilder<QuerySnapshot>(
         stream: _firestore.collection('products').snapshots(),
         builder: (context, snapshot) {
-          if (snapshot.hasError)
+          if (snapshot.hasError) {
             return const Center(child: Text('Error loading products'));
-          if (snapshot.connectionState == ConnectionState.waiting)
+          }
+          if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
+          }
 
           final products = snapshot.data!.docs;
-          if (products.isEmpty)
+          if (products.isEmpty) {
             return const Center(child: Text('No products found.'));
+          }
 
           return ListView.builder(
             itemCount: products.length,
@@ -39,13 +42,19 @@ class _ManageProductsPageState extends State<ManageProductsPage> {
 
               return ListTile(
                 leading: data['imageBase64'] != null &&
-                        data['imageBase64'].isNotEmpty
-                    ? Image.memory(base64Decode(data['imageBase64']),
-                        width: 40, height: 40, fit: BoxFit.cover)
+                        (data['imageBase64'] as List).isNotEmpty
+                    ? Image.memory(
+                        base64Decode((data['imageBase64'] as List).first),
+                        width: 40,
+                        height: 40,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) =>
+                            const Icon(Icons.image),
+                      )
                     : const Icon(Icons.image),
                 title: Text(data['name'] ?? 'No name'),
                 subtitle: Text(
-                    "LKR ${data['price'] ?? '0.00'} | Stock: ${data['stock'] ?? '0'}"),
+                    "LKR ${data['price']?.toString() ?? '0.00'} | Stock: ${data['stock']?.toString() ?? '0'}"),
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -91,7 +100,9 @@ class _ManageProductsPageState extends State<ManageProductsPage> {
     String description = data?['description'] ?? '';
     String price = data?['price']?.toString() ?? '';
     String stock = data?['stock']?.toString() ?? '';
-    _base64Image = data?['imageBase64'] ?? '';
+    _base64Images = data != null && data['imageBase64'] != null
+        ? List<String>.from(data['imageBase64'])
+        : [];
 
     List<String> categories = [
       'Tyer',
@@ -170,22 +181,80 @@ class _ManageProductsPageState extends State<ManageProductsPage> {
                       onSaved: (value) => category = value ?? 'Tyer',
                     ),
                     const SizedBox(height: 10),
-                    _base64Image != null && _base64Image!.isNotEmpty
-                        ? Image.memory(base64Decode(_base64Image!),
-                            width: 80, height: 80, fit: BoxFit.cover)
-                        : const Text('No image selected'),
-                    TextButton.icon(
-                      onPressed: () async {
-                        final picker = ImagePicker();
-                        final pickedFile = await picker.pickImage(
-                            source: ImageSource.gallery, imageQuality: 70);
-                        if (pickedFile != null) {
-                          final bytes = await pickedFile.readAsBytes();
-                          setState(() => _base64Image = base64Encode(bytes));
-                        }
-                      },
-                      icon: const Icon(Icons.image),
-                      label: const Text('Pick Image'),
+                    const Text('Images (up to 3)',
+                        style: TextStyle(fontSize: 12)),
+                    SizedBox(
+                      height: 100,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: _base64Images.length + 1,
+                        itemBuilder: (context, index) {
+                          if (index == _base64Images.length &&
+                              _base64Images.length < 3) {
+                            return Padding(
+                              padding: const EdgeInsets.only(right: 8.0),
+                              child: GestureDetector(
+                                onTap: () async {
+                                  final picker = ImagePicker();
+                                  final pickedFile = await picker.pickImage(
+                                      source: ImageSource.gallery,
+                                      imageQuality: 70);
+                                  if (pickedFile != null) {
+                                    final bytes =
+                                        await pickedFile.readAsBytes();
+                                    setState(() {
+                                      _base64Images.add(base64Encode(bytes));
+                                    });
+                                  }
+                                },
+                                child: Container(
+                                  width: 80,
+                                  height: 80,
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey.shade200,
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: const Icon(Icons.add_a_photo),
+                                ),
+                              ),
+                            );
+                          }
+                          return Padding(
+                            padding: const EdgeInsets.only(right: 8.0),
+                            child: Stack(
+                              children: [
+                                Image.memory(
+                                  base64Decode(_base64Images[index]),
+                                  width: 80,
+                                  height: 80,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) =>
+                                      const Icon(Icons.error),
+                                ),
+                                Positioned(
+                                  top: 0,
+                                  right: 0,
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        _base64Images.removeAt(index);
+                                      });
+                                    },
+                                    child: Container(
+                                      decoration: const BoxDecoration(
+                                        color: Colors.red,
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: const Icon(Icons.close,
+                                          size: 16, color: Colors.white),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
                     ),
                     const SizedBox(height: 10),
                     Row(
@@ -209,7 +278,7 @@ class _ManageProductsPageState extends State<ManageProductsPage> {
                                 'price': double.parse(price),
                                 'stock': int.parse(stock),
                                 'category': category,
-                                'imageBase64': _base64Image ?? '',
+                                'imageBase64': _base64Images,
                                 'sellerId': userId,
                               };
 
@@ -243,7 +312,7 @@ class _ManageProductsPageState extends State<ManageProductsPage> {
                           child: Text(id == null ? 'Add' : 'Update'),
                         ),
                       ],
-                    )
+                    ),
                   ],
                 ),
               ),
@@ -251,6 +320,11 @@ class _ManageProductsPageState extends State<ManageProductsPage> {
           ),
         );
       },
-    );
+    ).then((_) {
+      // Reset _base64Images when dialog is closed
+      setState(() {
+        _base64Images = [];
+      });
+    });
   }
 }

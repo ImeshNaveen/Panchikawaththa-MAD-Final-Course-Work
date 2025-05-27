@@ -24,8 +24,11 @@ class _HomePageState extends State<HomePage>
   bool _showSupportMenu = false;
   List<Category> _categories = [];
   List<Product> _products = [];
+  List<Product> _filteredProducts = []; // For search results
   bool _isLoading = true;
   bool _isProductLoading = true;
+  String _searchQuery = '';
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
@@ -35,19 +38,38 @@ class _HomePageState extends State<HomePage>
   }
 
   Future<void> _loadCategories() async {
-    final categories = await CategoryService().getCategories();
-    setState(() {
-      _categories = categories;
-      _isLoading = false;
-    });
+    try {
+      final categories = await CategoryService().getCategories();
+      setState(() {
+        _categories = categories;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error loading categories: $e')),
+      );
+    }
   }
 
   Future<void> _loadProducts() async {
-    final products = await ProductService().getProducts();
-    setState(() {
-      _products = products;
-      _isProductLoading = false;
-    });
+    try {
+      final products = await ProductService().getProducts();
+      setState(() {
+        _products = products;
+        _filteredProducts = products; // Initialize filtered products
+        _isProductLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isProductLoading = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error loading products: $e')),
+      );
+    }
   }
 
   void _toggleSupportMenu() {
@@ -56,168 +78,207 @@ class _HomePageState extends State<HomePage>
     });
   }
 
+  void _onSearchChanged(String query) {
+    setState(() {
+      _searchQuery = query.toLowerCase();
+      _filteredProducts = _products.where((product) {
+        return product.name.toLowerCase().contains(_searchQuery);
+      }).toList();
+    });
+  }
+
+  Future<void> _refreshProducts() async {
+    setState(() {
+      _isProductLoading = true;
+    });
+    await _loadProducts();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      body: Stack(
-        children: [
-          SafeArea(
-            child: SingleChildScrollView(
-              padding: EdgeInsets.symmetric(horizontal: 16.w),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(height: 10.h),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Image.asset("assets/logo.png", height: 50.h),
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => NotificationsPage()),
-                          );
-                        },
-                        child: Icon(Icons.notifications_none, size: 26.sp),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 24.h),
-                  Row(
-                    children: [
-                      SizedBox(width: 10.w),
-                      Expanded(
-                        child: Container(
-                          padding: EdgeInsets.symmetric(horizontal: 12.w),
-                          decoration: BoxDecoration(
-                            color: Colors.grey[200],
-                            borderRadius: BorderRadius.circular(20.r),
-                          ),
-                          child: Row(
-                            children: [
-                              Icon(Icons.search, color: Colors.grey),
-                              SizedBox(width: 8.w),
-                              Expanded(
-                                child: TextField(
-                                  decoration: InputDecoration(
-                                    hintText: "Search for products",
-                                    border: InputBorder.none,
+      body: RefreshIndicator(
+        onRefresh: _refreshProducts,
+        child: Stack(
+          children: [
+            SafeArea(
+              child: SingleChildScrollView(
+                padding: EdgeInsets.symmetric(horizontal: 16.w),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(height: 10.h),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Image.asset("assets/logo.png", height: 50.h),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => NotificationsPage()),
+                            );
+                          },
+                          child: Icon(Icons.notifications_none, size: 26.sp),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 24.h),
+                    Row(
+                      children: [
+                        SizedBox(width: 10.w),
+                        Expanded(
+                          child: Container(
+                            padding: EdgeInsets.symmetric(horizontal: 12.w),
+                            decoration: BoxDecoration(
+                              color: Colors.grey[200],
+                              borderRadius: BorderRadius.circular(20.r),
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(Icons.search, color: Colors.grey),
+                                SizedBox(width: 8.w),
+                                Expanded(
+                                  child: TextField(
+                                    controller: _searchController,
+                                    decoration: const InputDecoration(
+                                      hintText: "Search for products",
+                                      border: InputBorder.none,
+                                    ),
+                                    onChanged: _onSearchChanged,
                                   ),
                                 ),
-                              ),
-                              Icon(Icons.mic, color: Colors.grey),
-                            ],
+                                Icon(Icons.mic, color: Colors.grey),
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 24.h),
-                  Text('Categories',
-                      style: TextStyle(
-                          fontSize: 16.sp, fontWeight: FontWeight.bold)),
-                  SizedBox(height: 12.h),
-                  _isLoading
-                      ? Center(child: CircularProgressIndicator())
-                      : SizedBox(
-                          height: 60.h,
-                          child: ListView.builder(
-                            scrollDirection: Axis.horizontal,
-                            itemCount: _categories.length,
-                            itemBuilder: (context, index) {
-                              final category = _categories[index];
-                              return GestureDetector(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => CategoryPage()),
-                                  );
+                      ],
+                    ),
+                    SizedBox(height: 24.h),
+                    Text('Categories',
+                        style: TextStyle(
+                            fontSize: 16.sp, fontWeight: FontWeight.bold)),
+                    SizedBox(height: 12.h),
+                    _isLoading
+                        ? const Center(child: CircularProgressIndicator())
+                        : SizedBox(
+                            height: 60.h,
+                            child: ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              itemCount: _categories.length,
+                              itemBuilder: (context, index) {
+                                final category = _categories[index];
+                                return GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => CategoryPage()),
+                                    );
+                                  },
+                                  child: categoryItem(category.imageBase64),
+                                );
+                              },
+                            ),
+                          ),
+                    SizedBox(height: 24.h),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('Today Hot Deals',
+                            style: TextStyle(
+                                fontSize: 16.sp, fontWeight: FontWeight.bold)),
+                        IconButton(
+                          icon: Icon(Icons.refresh, size: 20.sp),
+                          onPressed: _refreshProducts,
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 12.h),
+                    _isProductLoading
+                        ? const Center(child: CircularProgressIndicator())
+                        : _filteredProducts.isEmpty
+                            ? const Center(child: Text('No products found.'))
+                            : GridView.builder(
+                                itemCount: _filteredProducts.length,
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                gridDelegate:
+                                    SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 2,
+                                  mainAxisSpacing: 16.h,
+                                  crossAxisSpacing: 16.w,
+                                  childAspectRatio: 0.7,
+                                ),
+                                itemBuilder: (context, index) {
+                                  return dealCard(
+                                      context, _filteredProducts[index]);
                                 },
-                                child: categoryItem(category.imageBase64),
-                              );
-                            },
-                          ),
-                        ),
-                  SizedBox(height: 24.h),
-                  Text('Today Hot Deals',
-                      style: TextStyle(
-                          fontSize: 16.sp, fontWeight: FontWeight.bold)),
-                  SizedBox(height: 12.h),
-                  _isProductLoading
-                      ? Center(child: CircularProgressIndicator())
-                      : GridView.builder(
-                          itemCount: _products.length,
-                          shrinkWrap: true,
-                          physics: NeverScrollableScrollPhysics(),
-                          gridDelegate:
-                              SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            mainAxisSpacing: 16.h,
-                            crossAxisSpacing: 16.w,
-                            childAspectRatio: 0.7,
-                          ),
-                          itemBuilder: (context, index) {
-                            return dealCard(context, _products[index]);
-                          },
-                        )
-                ],
-              ),
-            ),
-          ),
-          if (_showSupportMenu) ...[
-            // Add a semi-transparent background for emphasis
-            Positioned.fill(
-              child: GestureDetector(
-                onTap: _toggleSupportMenu,
-                child: Container(
-                  color: Colors.black.withOpacity(0.15),
-                ),
-              ),
-            ),
-            Positioned(
-              bottom: 90,
-              right: 16,
-              child: Material(
-                color: Colors.transparent,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    _supportMenuItem(
-                      icon: Icons.smart_toy,
-                      text: "Chat with Mario",
-                      onTap: () {
-                        _toggleSupportMenu();
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const ChatBotPage()),
-                        );
-                      },
-                    ),
-                    SizedBox(height: 10),
-                    _supportMenuItem(
-                      icon: Icons.support_agent,
-                      text: "Service Centers",
-                      onTap: () {
-                        _toggleSupportMenu();
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => ServiceCentersPage()),
-                        );
-                      },
-                    ),
+                              ),
+                    SizedBox(height: 20.h),
                   ],
                 ),
               ),
             ),
+            if (_showSupportMenu) ...[
+              Positioned.fill(
+                child: GestureDetector(
+                  onTap: _toggleSupportMenu,
+                  child: Container(
+                    color: Colors.black.withOpacity(0.15),
+                  ),
+                ),
+              ),
+              Positioned(
+                bottom: 90,
+                right: 16,
+                child: Material(
+                  color: Colors.transparent,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      _supportMenuItem(
+                        icon: Icons.smart_toy,
+                        text: "Chat with Mario",
+                        onTap: () {
+                          _toggleSupportMenu();
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const ChatBotPage()),
+                          );
+                        },
+                      ),
+                      SizedBox(height: 10),
+                      _supportMenuItem(
+                        icon: Icons.support_agent,
+                        text: "Service Centers",
+                        onTap: () {
+                          _toggleSupportMenu();
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => ServiceCentersPage()),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ],
-        ],
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.green,
@@ -225,12 +286,12 @@ class _HomePageState extends State<HomePage>
         shape: const CircleBorder(),
         onPressed: _toggleSupportMenu,
         child: AnimatedSwitcher(
-          duration: Duration(milliseconds: 200),
+          duration: const Duration(milliseconds: 200),
           child: _showSupportMenu
               ? Icon(Icons.close,
-                  key: ValueKey('close'), color: Colors.white, size: 32)
+                  key: const ValueKey('close'), color: Colors.white, size: 32)
               : ClipOval(
-                  key: ValueKey('bot'),
+                  key: const ValueKey('bot'),
                   child: Image.asset(
                     'assets/mario_bot.jpg',
                     width: 46,
@@ -255,7 +316,7 @@ class _HomePageState extends State<HomePage>
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(14),
-          boxShadow: [
+          boxShadow: const [
             BoxShadow(
                 color: Colors.black26,
                 blurRadius: 16,
@@ -267,11 +328,11 @@ class _HomePageState extends State<HomePage>
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(text,
-                style: TextStyle(
+                style: const TextStyle(
                     color: Color(0xFF02B91A),
                     fontWeight: FontWeight.w600,
                     fontSize: 15)),
-            Icon(icon, color: Color(0xFF02B91A)),
+            Icon(icon, color: const Color(0xFF02B91A)),
           ],
         ),
       ),
@@ -286,6 +347,8 @@ class _HomePageState extends State<HomePage>
         radius: 30.r,
         backgroundColor: Colors.grey[200],
         backgroundImage: MemoryImage(bytes),
+        onBackgroundImageError: (exception, stackTrace) =>
+            const AssetImage('assets/placeholder_image.png') as ImageProvider,
       ),
     );
   }
@@ -297,7 +360,9 @@ class _HomePageState extends State<HomePage>
         borderRadius: BorderRadius.circular(12.r),
         boxShadow: [
           BoxShadow(
-              color: Colors.black12, blurRadius: 6.r, offset: Offset(0, 2)),
+              color: Colors.black12,
+              blurRadius: 6.r,
+              offset: const Offset(0, 2)),
         ],
       ),
       child: InkWell(
@@ -314,12 +379,25 @@ class _HomePageState extends State<HomePage>
           children: [
             ClipRRect(
               borderRadius: BorderRadius.vertical(top: Radius.circular(12.r)),
-              child: Image.memory(
-                base64Decode(product.imageBase64),
-                height: 100.h,
-                width: double.infinity,
-                fit: BoxFit.cover,
-              ),
+              child: product.imageBase64.isNotEmpty
+                  ? Image.memory(
+                      base64Decode(product.imageBase64.first),
+                      height: 100.h,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => Image.asset(
+                        'assets/placeholder_image.png',
+                        height: 100.h,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                      ),
+                    )
+                  : Image.asset(
+                      'assets/placeholder_image.png',
+                      height: 100.h,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                    ),
             ),
             Padding(
               padding: EdgeInsets.all(8.w),
@@ -329,8 +407,13 @@ class _HomePageState extends State<HomePage>
                   Row(
                     children: List.generate(
                       5,
-                      (index) =>
-                          Icon(Icons.star, color: Colors.amber, size: 14.sp),
+                      (index) => Icon(
+                        Icons.star,
+                        color: index < product.rating.round()
+                            ? Colors.amber
+                            : Colors.grey,
+                        size: 14.sp,
+                      ),
                     ),
                   ),
                   SizedBox(height: 4.h),
@@ -341,17 +424,23 @@ class _HomePageState extends State<HomePage>
                     maxLines: 2,
                   ),
                   SizedBox(height: 4.h),
-                  Text("LKR ${product.price.toStringAsFixed(2)}",
-                      style: TextStyle(fontSize: 12.sp, color: Colors.black87)),
+                  Text(
+                    "LKR ${product.price.toStringAsFixed(2)}",
+                    style: TextStyle(fontSize: 12.sp, color: Colors.black87),
+                  ),
                   SizedBox(height: 4.h),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text("${product.sold} sold",
-                          style:
-                              TextStyle(fontSize: 10.sp, color: Colors.grey)),
-                      Icon(Icons.shopping_cart,
-                          color: Colors.green, size: 16.sp),
+                      Text(
+                        "${product.sold} sold",
+                        style: TextStyle(fontSize: 10.sp, color: Colors.grey),
+                      ),
+                      Icon(
+                        Icons.shopping_cart,
+                        color: Colors.green,
+                        size: 16.sp,
+                      ),
                     ],
                   ),
                 ],
@@ -362,4 +451,8 @@ class _HomePageState extends State<HomePage>
       ),
     );
   }
+}
+
+extension on String {
+  String get first => isNotEmpty ? this[0] : '';
 }
