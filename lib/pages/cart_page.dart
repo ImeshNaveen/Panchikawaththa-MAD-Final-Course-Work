@@ -1,5 +1,10 @@
+import 'dart:convert';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:panchikawaththa/models/cart_item_model.dart';
 
 class CartPage extends StatefulWidget {
   const CartPage({super.key});
@@ -9,49 +14,52 @@ class CartPage extends StatefulWidget {
 }
 
 class _CartPageState extends State<CartPage> {
-  List<bool> selectedItems = [false, false, false, false, false];
+  List<CartItem> cartItems = [];
+  List<bool> selectedItems = [];
   double total = 0;
 
-  final List<Map<String, dynamic>> cartItems = [
-    {
-      'name': 'Front Brake Disc',
-      'price': 15003.25,
-      'image': 'assets/brake.jpg',
-      'quantity': 1
-    },
-    {
-      'name': 'Clutch Disc',
-      'price': 12919.47,
-      'image': 'assets/clutch_disc.jpg',
-      'quantity': 1
-    },
-    {
-      'name': 'Alternator',
-      'price': 45000.00,
-      'image': 'assets/alternator.jpg',
-      'quantity': 1
-    },
-    {
-      'name': 'Lid Projector Headlights',
-      'price': 105500.00,
-      'image': 'assets/light.jpg',
-      'quantity': 1
-    },
-    {
-      'name': 'Air Filter',
-      'price': 5670.00,
-      'image': 'assets/airfilter.jpg',
-      'quantity': 1
-    },
-  ];
+  @override
+  void initState() {
+    super.initState();
+    fetchCartItems();
+  }
+
+  Future<void> fetchCartItems() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+
+    final snapshot = await FirebaseFirestore.instance
+        .collection('cart')
+        .where('userId', isEqualTo: user.uid)
+        .get();
+
+    final items = snapshot.docs.map((doc) {
+      return CartItem.fromMap(doc.id, doc.data());
+    }).toList();
+
+    setState(() {
+      cartItems = items;
+      selectedItems = List<bool>.filled(items.length, false);
+      updateTotal();
+    });
+  }
 
   void updateTotal() {
     total = 0;
     for (int i = 0; i < selectedItems.length; i++) {
       if (selectedItems[i]) {
-        total += cartItems[i]['price'];
+        total += cartItems[i].price * cartItems[i].quantity;
       }
     }
+    setState(() {});
+  }
+
+  Future<void> updateQuantity(CartItem item, int newQty) async {
+    await FirebaseFirestore.instance
+        .collection('cart')
+        .doc(item.id)
+        .update({'quantity': newQty});
+    fetchCartItems();
   }
 
   @override
@@ -70,8 +78,8 @@ class _CartPageState extends State<CartPage> {
                 Text('My Cart',
                     style: TextStyle(
                         fontSize: 18.sp, fontWeight: FontWeight.bold)),
-                Spacer(),
-                Icon(Icons.delete_outline),
+                const Spacer(),
+                const Icon(Icons.delete_outline),
               ],
             ),
             SizedBox(height: 16.h),
@@ -108,29 +116,48 @@ class _CartPageState extends State<CartPage> {
                             });
                           },
                         ),
-                        Image.asset(item['image'], width: 50.w, height: 50.h),
+                        Image.memory(
+                          base64Decode(item.imageBase64),
+                          width: 50.w,
+                          height: 50.h,
+                          fit: BoxFit.cover,
+                        ),
                         SizedBox(width: 10.w),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(item['name'],
+                              Text(item.name,
                                   style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 14.sp)),
                               SizedBox(height: 4.h),
-                              Text('LKR ${item['price'].toStringAsFixed(2)}',
-                                  style: TextStyle(color: Color(0xFF02B91A))),
+                              Text(
+                                  'LKR ${(item.price * item.quantity).toStringAsFixed(2)}',
+                                  style: TextStyle(
+                                      color: const Color(0xFF02B91A))),
                             ],
                           ),
                         ),
                         Row(
                           children: [
-                            Icon(Icons.remove_circle_outline),
+                            GestureDetector(
+                              onTap: () {
+                                if (item.quantity > 1) {
+                                  updateQuantity(item, item.quantity - 1);
+                                }
+                              },
+                              child: const Icon(Icons.remove_circle_outline),
+                            ),
                             SizedBox(width: 6.w),
-                            Text('1'),
+                            Text(item.quantity.toString()),
                             SizedBox(width: 6.w),
-                            Icon(Icons.add_circle_outline),
+                            GestureDetector(
+                              onTap: () {
+                                updateQuantity(item, item.quantity + 1);
+                              },
+                              child: const Icon(Icons.add_circle_outline),
+                            ),
                           ],
                         )
                       ],
@@ -149,7 +176,7 @@ class _CartPageState extends State<CartPage> {
             // Payment logic
           },
           style: ElevatedButton.styleFrom(
-            backgroundColor: Color(0xFF02B91A),
+            backgroundColor: const Color(0xFF02B91A),
             padding: EdgeInsets.symmetric(vertical: 14.h),
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(30.r)),

@@ -1,6 +1,8 @@
 import 'dart:convert';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:panchikawaththa/models/Product_Model.dart';
+import '../../models/Product_Model.dart';
 
 class CartPopupContent extends StatefulWidget {
   final Product? product;
@@ -13,33 +15,61 @@ class CartPopupContent extends StatefulWidget {
 
 class _CartPopupContentState extends State<CartPopupContent> {
   int quantity = 1;
+  bool isLoading = false;
 
-  void incrementQuantity() {
+  void addToCart() async {
+    if (widget.product == null) return;
+
     setState(() {
-      quantity++;
+      isLoading = true;
     });
-  }
 
-  void decrementQuantity() {
-    if (quantity > 1) {
-      setState(() {
-        quantity--;
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) throw Exception("User not logged in");
+
+      await FirebaseFirestore.instance.collection('cart').add({
+        'userId': user.uid,
+        'productId': widget.product!.id,
+        'name': widget.product!.name,
+        'price': widget.product!.price,
+        'imageBase64': widget.product!.imageBase64.first,
+        'quantity': quantity,
+        'dateAdded': Timestamp.now(),
       });
+
+      if (mounted) {
+        Navigator.pop(context); // Close popup
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Product added to cart")),
+        );
+      }
+    } catch (e) {
+      print("Error adding to cart: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Failed to add to cart: $e")),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final product = widget.product;
+
     if (product == null) {
       return const Center(child: Text("Product not available."));
     }
 
-    double totalPrice = product.price * quantity;
-
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
+        const SizedBox(height: 12),
         const Text(
           'Add to Cart',
           style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
@@ -58,44 +88,29 @@ class _CartPopupContentState extends State<CartPopupContent> {
           subtitle: Text('LKR ${product.price.toStringAsFixed(2)}'),
         ),
         const SizedBox(height: 8),
-
-        /// Quantity Selector
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             IconButton(
-              onPressed: decrementQuantity,
+              onPressed: quantity > 1 ? () => setState(() => quantity--) : null,
               icon: const Icon(Icons.remove_circle_outline),
             ),
-            Text(
-              '$quantity',
-              style: const TextStyle(fontSize: 18),
-            ),
+            Text(quantity.toString(), style: const TextStyle(fontSize: 16)),
             IconButton(
-              onPressed: incrementQuantity,
+              onPressed: () => setState(() => quantity++),
               icon: const Icon(Icons.add_circle_outline),
             ),
           ],
         ),
-
-        const SizedBox(height: 8),
-        Text(
-          'Total: LKR ${totalPrice.toStringAsFixed(2)}',
-          style: const TextStyle(
-              fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black),
-        ),
         const SizedBox(height: 16),
-        ElevatedButton(
-          onPressed: () {
-            Navigator.pop(context); // Close popup
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text("Added $quantity item(s) to cart")),
-            );
-          },
-          style: ElevatedButton.styleFrom(backgroundColor: Colors.black),
-          child: const Text("Confirm Add to Cart",
-              style: TextStyle(color: Colors.white)),
-        ),
+        isLoading
+            ? const CircularProgressIndicator()
+            : ElevatedButton(
+                onPressed: addToCart,
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.black),
+                child: const Text("Confirm Add to Cart",
+                    style: TextStyle(color: Colors.white)),
+              ),
         const SizedBox(height: 16),
       ],
     );
