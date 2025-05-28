@@ -14,6 +14,32 @@ class ManageProductsPage extends StatefulWidget {
 class _ManageProductsPageState extends State<ManageProductsPage> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   List<String> _base64Images = [];
+  List<String> _categories = [];
+  bool _isCategoryLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchCategories();
+  }
+
+  Future<void> _fetchCategories() async {
+    try {
+      final snapshot =
+          await FirebaseFirestore.instance.collection('categories').get();
+      final categoryList = snapshot.docs
+          .map((doc) => doc['name'].toString())
+          .where((name) => name.isNotEmpty)
+          .toList();
+      setState(() {
+        _categories = categoryList;
+        _isCategoryLoading = false;
+      });
+    } catch (e) {
+      print('Error fetching categories: $e');
+      setState(() => _isCategoryLoading = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -96,7 +122,7 @@ class _ManageProductsPageState extends State<ManageProductsPage> {
       BuildContext context, String? id, Map<String, dynamic>? data) {
     final _formKey = GlobalKey<FormState>();
     String name = data?['name'] ?? '';
-    String category = data?['category'] ?? 'Tyer';
+    String category = data?['category'] ?? '';
     String description = data?['description'] ?? '';
     String price = data?['price']?.toString() ?? '';
     String stock = data?['stock']?.toString() ?? '';
@@ -104,96 +130,138 @@ class _ManageProductsPageState extends State<ManageProductsPage> {
         ? List<String>.from(data['imageBase64'])
         : [];
 
-    List<String> categories = [
-      'Tyer',
-      'Brake Pad',
-      'Battery',
-      'Engine Oil',
-      'Air Filter',
-      'Spark Plug',
-      'Wiper Blade'
-    ];
-
     showDialog(
       context: context,
       builder: (context) {
         return Dialog(
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          child: Container(
-            padding: const EdgeInsets.all(20),
-            width: 300,
-            child: Form(
-              key: _formKey,
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Center(
-                        child: Text('Add Product',
-                            style: TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.bold))),
-                    const SizedBox(height: 10),
-                    TextFormField(
-                      initialValue: name,
-                      decoration:
-                          const InputDecoration(labelText: 'Product Name'),
-                      validator: (value) =>
-                          value == null || value.isEmpty ? 'Enter name' : null,
-                      onSaved: (value) => name = value!.trim(),
-                    ),
-                    TextFormField(
-                      initialValue: description,
-                      decoration:
-                          const InputDecoration(labelText: 'Description'),
-                      onSaved: (value) => description = value?.trim() ?? '',
-                    ),
-                    TextFormField(
-                      initialValue: price,
-                      decoration: const InputDecoration(labelText: 'Price'),
-                      keyboardType: TextInputType.number,
-                      validator: (value) =>
-                          value == null || double.tryParse(value) == null
-                              ? 'Enter valid price'
-                              : null,
-                      onSaved: (value) => price = value!.trim(),
-                    ),
-                    TextFormField(
-                      initialValue: stock,
-                      decoration: const InputDecoration(labelText: 'Stock'),
-                      keyboardType: TextInputType.number,
-                      validator: (value) =>
-                          value == null || int.tryParse(value) == null
-                              ? 'Enter valid stock'
-                              : null,
-                      onSaved: (value) => stock = value!.trim(),
-                    ),
-                    const SizedBox(height: 10),
-                    const Text('Category', style: TextStyle(fontSize: 12)),
-                    DropdownButtonFormField<String>(
-                      value: category,
-                      items: categories
-                          .map((cat) =>
-                              DropdownMenuItem(value: cat, child: Text(cat)))
-                          .toList(),
-                      onChanged: (value) => category = value ?? 'Tyer',
-                      onSaved: (value) => category = value ?? 'Tyer',
-                    ),
-                    const SizedBox(height: 10),
-                    const Text('Images (up to 3)',
-                        style: TextStyle(fontSize: 12)),
-                    SizedBox(
-                      height: 100,
-                      child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: _base64Images.length + 1,
-                        itemBuilder: (context, index) {
-                          if (index == _base64Images.length &&
-                              _base64Images.length < 3) {
-                            return Padding(
-                              padding: const EdgeInsets.only(right: 8.0),
-                              child: GestureDetector(
+          child: StatefulBuilder(
+            builder: (context, setState) => Container(
+              padding: const EdgeInsets.all(20),
+              width: 300,
+              child: Form(
+                key: _formKey,
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Center(
+                          child: Text('Add Product',
+                              style: TextStyle(
+                                  fontSize: 18, fontWeight: FontWeight.bold))),
+                      const SizedBox(height: 10),
+                      TextFormField(
+                        initialValue: name,
+                        decoration:
+                            const InputDecoration(labelText: 'Product Name'),
+                        validator: (value) => value == null || value.isEmpty
+                            ? 'Enter name'
+                            : null,
+                        onSaved: (value) => name = value!.trim(),
+                      ),
+                      TextFormField(
+                        initialValue: description,
+                        decoration:
+                            const InputDecoration(labelText: 'Description'),
+                        onSaved: (value) => description = value?.trim() ?? '',
+                      ),
+                      TextFormField(
+                        initialValue: price,
+                        decoration: const InputDecoration(labelText: 'Price'),
+                        keyboardType: TextInputType.number,
+                        validator: (value) =>
+                            value == null || double.tryParse(value) == null
+                                ? 'Enter valid price'
+                                : null,
+                        onSaved: (value) => price = value!.trim(),
+                      ),
+                      TextFormField(
+                        initialValue: stock,
+                        decoration: const InputDecoration(labelText: 'Stock'),
+                        keyboardType: TextInputType.number,
+                        validator: (value) =>
+                            value == null || int.tryParse(value) == null
+                                ? 'Enter valid stock'
+                                : null,
+                        onSaved: (value) => stock = value!.trim(),
+                      ),
+                      const SizedBox(height: 10),
+                      const Text('Category', style: TextStyle(fontSize: 12)),
+                      _isCategoryLoading
+                          ? const Padding(
+                              padding: EdgeInsets.symmetric(vertical: 8.0),
+                              child: CircularProgressIndicator(),
+                            )
+                          : DropdownButtonFormField<String>(
+                              value: _categories.contains(category)
+                                  ? category
+                                  : null,
+                              decoration:
+                                  const InputDecoration(labelText: 'Category'),
+                              items: _categories
+                                  .map((cat) => DropdownMenuItem(
+                                        value: cat,
+                                        child: Text(cat),
+                                      ))
+                                  .toList(),
+                              onChanged: (value) => category = value ?? '',
+                              onSaved: (value) => category = value ?? '',
+                              validator: (value) =>
+                                  value == null || value.isEmpty
+                                      ? 'Please select a category'
+                                      : null,
+                            ),
+                      const SizedBox(height: 10),
+                      const Text('Images (up to 3)',
+                          style: TextStyle(fontSize: 12)),
+                      SizedBox(
+                        height: 100,
+                        child: ListView(
+                          scrollDirection: Axis.horizontal,
+                          children: [
+                            ..._base64Images.asMap().entries.map((entry) {
+                              int index = entry.key;
+                              String base64 = entry.value;
+                              return Padding(
+                                padding: const EdgeInsets.only(right: 8.0),
+                                child: Stack(
+                                  children: [
+                                    Image.memory(
+                                      base64Decode(base64),
+                                      width: 80,
+                                      height: 80,
+                                      fit: BoxFit.cover,
+                                      errorBuilder:
+                                          (context, error, stackTrace) =>
+                                              const Icon(Icons.error),
+                                    ),
+                                    Positioned(
+                                      top: 0,
+                                      right: 0,
+                                      child: GestureDetector(
+                                        onTap: () {
+                                          setState(() {
+                                            _base64Images.removeAt(index);
+                                          });
+                                        },
+                                        child: Container(
+                                          decoration: const BoxDecoration(
+                                            color: Colors.red,
+                                            shape: BoxShape.circle,
+                                          ),
+                                          child: const Icon(Icons.close,
+                                              size: 16, color: Colors.white),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }),
+                            if (_base64Images.length < 3)
+                              GestureDetector(
                                 onTap: () async {
                                   final picker = ImagePicker();
                                   final pickedFile = await picker.pickImage(
@@ -217,103 +285,68 @@ class _ManageProductsPageState extends State<ManageProductsPage> {
                                   child: const Icon(Icons.add_a_photo),
                                 ),
                               ),
-                            );
-                          }
-                          return Padding(
-                            padding: const EdgeInsets.only(right: 8.0),
-                            child: Stack(
-                              children: [
-                                Image.memory(
-                                  base64Decode(_base64Images[index]),
-                                  width: 80,
-                                  height: 80,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) =>
-                                      const Icon(Icons.error),
-                                ),
-                                Positioned(
-                                  top: 0,
-                                  right: 0,
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      setState(() {
-                                        _base64Images.removeAt(index);
-                                      });
-                                    },
-                                    child: Container(
-                                      decoration: const BoxDecoration(
-                                        color: Colors.red,
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: const Icon(Icons.close,
-                                          size: 16, color: Colors.white),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
-                        },
+                          ],
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 10),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        TextButton(
-                          onPressed: () => Navigator.of(context).pop(),
-                          child: const Text('Cancel'),
-                        ),
-                        ElevatedButton(
-                          onPressed: () async {
-                            if (_formKey.currentState!.validate()) {
-                              _formKey.currentState!.save();
-                              final currentUser =
-                                  FirebaseAuth.instance.currentUser;
-                              final userId = currentUser?.uid ?? '';
+                      const SizedBox(height: 10),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          TextButton(
+                            onPressed: () => Navigator.of(context).pop(),
+                            child: const Text('Cancel'),
+                          ),
+                          ElevatedButton(
+                            onPressed: () async {
+                              if (_formKey.currentState!.validate()) {
+                                _formKey.currentState!.save();
+                                final userId =
+                                    FirebaseAuth.instance.currentUser?.uid ??
+                                        '';
 
-                              final product = {
-                                'name': name,
-                                'description': description,
-                                'price': double.parse(price),
-                                'stock': int.parse(stock),
-                                'category': category,
-                                'imageBase64': _base64Images,
-                                'sellerId': userId,
-                              };
+                                final product = {
+                                  'name': name,
+                                  'description': description,
+                                  'price': double.parse(price),
+                                  'stock': int.parse(stock),
+                                  'category': category,
+                                  'imageBase64': _base64Images,
+                                  'sellerId': userId,
+                                };
 
-                              try {
-                                if (id == null) {
-                                  final docRef = await _firestore
-                                      .collection('products')
-                                      .add(product);
-                                  await docRef.update({'id': docRef.id});
+                                try {
+                                  if (id == null) {
+                                    final docRef = await _firestore
+                                        .collection('products')
+                                        .add(product);
+                                    await docRef.update({'id': docRef.id});
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(
+                                            content: Text('Product added')));
+                                  } else {
+                                    await _firestore
+                                        .collection('products')
+                                        .doc(id)
+                                        .update(product);
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(
+                                            content: Text('Product updated')));
+                                  }
+                                  Navigator.of(context).pop();
+                                } catch (e) {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                          content: Text('Product added')));
-                                } else {
-                                  await _firestore
-                                      .collection('products')
-                                      .doc(id)
-                                      .update(product);
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                          content: Text('Product updated')));
+                                      SnackBar(
+                                          content: Text(
+                                              'Failed to save product: $e')));
                                 }
-                                Navigator.of(context).pop();
-                              } catch (e) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                        content: Text(
-                                            'Failed to save product: $e')));
                               }
-                            }
-                          },
-                          child: Text(id == null ? 'Add' : 'Update'),
-                        ),
-                      ],
-                    ),
-                  ],
+                            },
+                            child: Text(id == null ? 'Add' : 'Update'),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -321,7 +354,6 @@ class _ManageProductsPageState extends State<ManageProductsPage> {
         );
       },
     ).then((_) {
-      // Reset _base64Images when dialog is closed
       setState(() {
         _base64Images = [];
       });
