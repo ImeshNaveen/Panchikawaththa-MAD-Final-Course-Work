@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:panchikawaththa/models/Product_Model.dart';
+import 'package:panchikawaththa/pages/add_to_cart_popup.dart';
 import 'package:panchikawaththa/pages/orderConfirmation.dart';
 import 'package:panchikawaththa/pages/review.dart';
 import 'package:share_plus/share_plus.dart';
@@ -128,7 +129,23 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
             Expanded(
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(backgroundColor: Colors.black),
-                onPressed: () => _addToCart(context),
+                onPressed: () {
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    backgroundColor: Colors.white,
+                    shape: const RoundedRectangleBorder(
+                      borderRadius:
+                          BorderRadius.vertical(top: Radius.circular(24)),
+                    ),
+                    builder: (_) => Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 24),
+                      child: CartPopupContent(
+                          product: product), // pass the actual product object
+                    ),
+                  );
+                },
                 child: const Text("Add to Cart",
                     style: TextStyle(color: Colors.white)),
               ),
