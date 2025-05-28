@@ -1,26 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class NotificationsPage extends StatelessWidget {
   const NotificationsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user == null) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('Notifications')),
+        body: const Center(child: Text('Please log in to view notifications')),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
-        title: Text('Notifications',
+        title: const Text('Notifications',
             style: TextStyle(fontWeight: FontWeight.bold)),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios),
+          icon: const Icon(Icons.arrow_back_ios),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.cleaning_services_outlined),
+            icon: const Icon(Icons.cleaning_services_outlined),
             onPressed: () {
-              // Add logic to clear notifications if needed
+              // Optional: Implement clear all notifications
             },
           )
         ],
@@ -30,38 +40,41 @@ class NotificationsPage extends StatelessWidget {
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
             .collection('notifications')
-            .orderBy('date', descending: true) // optional
+            .orderBy('date', descending: true)
             .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            // Loading state
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
-            // Error state
-            return Center(child: Text('Error loading notifications'));
+            print("Error: ${snapshot.error}");
+            return const Center(child: Text('Error loading notifications'));
           } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            // No data state
-            return Center(child: Text('No notifications'));
+            return const Center(child: Text('No notifications'));
           }
 
           final notifications = snapshot.data!.docs;
 
           return ListView.separated(
-            padding: EdgeInsets.all(8),
+            padding: const EdgeInsets.all(8),
             itemCount: notifications.length,
-            separatorBuilder: (context, index) => SizedBox(height: 10),
+            separatorBuilder: (context, index) => const SizedBox(height: 10),
             itemBuilder: (context, index) {
               final doc = notifications[index];
               final title = doc['title'] ?? 'No title';
               final subtitle = doc['subtitle'] ?? '';
-              final date = doc['date'] ?? '';
               final type = doc['type'] ?? 'shop';
+              final timestamp = doc['date'] as Timestamp?;
+              final date = timestamp != null
+                  ? '${timestamp.toDate().month}/${timestamp.toDate().day}'
+                  : '';
 
               return Container(
-                padding: EdgeInsets.all(12),
+                padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Color(0xFFF4F4F4),
+                  color: const Color(0xFFF4F4F4),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Row(
@@ -70,14 +83,15 @@ class NotificationsPage extends StatelessWidget {
                       type == 'shop' ? Icons.storefront : Icons.person,
                       size: 36,
                     ),
-                    SizedBox(width: 12),
+                    const SizedBox(width: 12),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(title,
-                              style: TextStyle(fontWeight: FontWeight.bold)),
-                          SizedBox(height: 4),
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold)),
+                          const SizedBox(height: 4),
                           Text(subtitle,
                               style: TextStyle(color: Colors.grey[600])),
                         ],

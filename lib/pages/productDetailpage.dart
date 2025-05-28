@@ -1,11 +1,12 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:panchikawaththa/models/product_model.dart';
+import 'package:panchikawaththa/models/Product_Model.dart';
+import 'package:panchikawaththa/pages/orderConfirmation.dart';
 import 'package:panchikawaththa/pages/review.dart';
 import 'package:share_plus/share_plus.dart';
 import 'seller_page.dart';
-import 'dart:math'; // Added for min function
+import 'dart:math';
 
 class ProductDetailPage extends StatefulWidget {
   final String productId;
@@ -137,9 +138,21 @@ class _ProductDetailPageState extends State<ProductDetailPage> {
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(backgroundColor: primaryColor),
                 onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Proceeding to checkout...')),
-                  );
+                  if (product != null) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            OrderConfirmationPage(product: product!),
+                      ),
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                          content:
+                              Text('Product not yet loaded. Please wait.')),
+                    );
+                  }
                 },
                 child: const Text("Buy Now",
                     style: TextStyle(color: Colors.white)),
