@@ -5,7 +5,6 @@ import 'package:panchikawaththa/pages/category.dart';
 import 'package:panchikawaththa/pages/chata_bot.dart';
 import 'package:panchikawaththa/pages/notification.dart';
 import 'package:panchikawaththa/pages/productDetailpage.dart';
-import 'package:panchikawaththa/pages/review.dart';
 import 'package:panchikawaththa/pages/serviceCenter.dart';
 import 'package:panchikawaththa/models/category_model.dart';
 import 'package:panchikawaththa/models/product_model.dart';
@@ -19,12 +18,11 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage>
-    with SingleTickerProviderStateMixin {
+class _HomePageState extends State<HomePage> {
   bool _showSupportMenu = false;
   List<Category> _categories = [];
   List<Product> _products = [];
-  List<Product> _filteredProducts = []; // For search results
+  List<Product> _filteredProducts = [];
   bool _isLoading = true;
   bool _isProductLoading = true;
   String _searchQuery = '';
@@ -45,9 +43,7 @@ class _HomePageState extends State<HomePage>
         _isLoading = false;
       });
     } catch (e) {
-      setState(() {
-        _isLoading = false;
-      });
+      setState(() => _isLoading = false);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error loading categories: $e')),
       );
@@ -59,13 +55,11 @@ class _HomePageState extends State<HomePage>
       final products = await ProductService().getProducts();
       setState(() {
         _products = products;
-        _filteredProducts = products; // Initialize filtered products
+        _filteredProducts = products;
         _isProductLoading = false;
       });
     } catch (e) {
-      setState(() {
-        _isProductLoading = false;
-      });
+      setState(() => _isProductLoading = false);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error loading products: $e')),
       );
@@ -73,9 +67,7 @@ class _HomePageState extends State<HomePage>
   }
 
   void _toggleSupportMenu() {
-    setState(() {
-      _showSupportMenu = !_showSupportMenu;
-    });
+    setState(() => _showSupportMenu = !_showSupportMenu);
   }
 
   void _onSearchChanged(String query) {
@@ -88,9 +80,7 @@ class _HomePageState extends State<HomePage>
   }
 
   Future<void> _refreshProducts() async {
-    setState(() {
-      _isProductLoading = true;
-    });
+    setState(() => _isProductLoading = true);
     await _loadProducts();
   }
 
@@ -116,193 +106,219 @@ class _HomePageState extends State<HomePage>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     SizedBox(height: 10.h),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Image.asset("assets/logo.png", height: 50.h),
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => NotificationsPage()),
-                            );
-                          },
-                          child: Icon(Icons.notifications_none, size: 26.sp),
-                        ),
-                      ],
-                    ),
+                    _buildTopBar(context),
                     SizedBox(height: 24.h),
-                    Row(
-                      children: [
-                        SizedBox(width: 10.w),
-                        Expanded(
-                          child: Container(
-                            padding: EdgeInsets.symmetric(horizontal: 12.w),
-                            decoration: BoxDecoration(
-                              color: Colors.grey[200],
-                              borderRadius: BorderRadius.circular(20.r),
-                            ),
-                            child: Row(
-                              children: [
-                                Icon(Icons.search, color: Colors.grey),
-                                SizedBox(width: 8.w),
-                                Expanded(
-                                  child: TextField(
-                                    controller: _searchController,
-                                    decoration: const InputDecoration(
-                                      hintText: "Search for products",
-                                      border: InputBorder.none,
-                                    ),
-                                    onChanged: _onSearchChanged,
-                                  ),
-                                ),
-                                Icon(Icons.mic, color: Colors.grey),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+                    _buildSearchBar(),
                     SizedBox(height: 24.h),
-                    Text('Categories',
-                        style: TextStyle(
-                            fontSize: 16.sp, fontWeight: FontWeight.bold)),
-                    SizedBox(height: 12.h),
-                    _isLoading
-                        ? const Center(child: CircularProgressIndicator())
-                        : SizedBox(
-                            height: 60.h,
-                            child: ListView.builder(
-                              scrollDirection: Axis.horizontal,
-                              itemCount: _categories.length,
-                              itemBuilder: (context, index) {
-                                final category = _categories[index];
-                                return GestureDetector(
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => CategoryPage()),
-                                    );
-                                  },
-                                  child: categoryItem(category.imageBase64),
-                                );
-                              },
-                            ),
-                          ),
+                    _buildCategorySection(),
                     SizedBox(height: 24.h),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text('Today Hot Deals',
-                            style: TextStyle(
-                                fontSize: 16.sp, fontWeight: FontWeight.bold)),
-                      ],
-                    ),
-                    SizedBox(height: 12.h),
-                    _isProductLoading
-                        ? const Center(child: CircularProgressIndicator())
-                        : _filteredProducts.isEmpty
-                            ? const Center(child: Text('No products found.'))
-                            : GridView.builder(
-                                itemCount: _filteredProducts.length,
-                                shrinkWrap: true,
-                                physics: const NeverScrollableScrollPhysics(),
-                                gridDelegate:
-                                    SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 2,
-                                  mainAxisSpacing: 16.h,
-                                  crossAxisSpacing: 16.w,
-                                  childAspectRatio: 0.7,
-                                ),
-                                itemBuilder: (context, index) {
-                                  return dealCard(
-                                      context, _filteredProducts[index]);
-                                },
-                              ),
+                    _buildHotDealsSection(context),
                     SizedBox(height: 20.h),
                   ],
                 ),
               ),
             ),
-            if (_showSupportMenu) ...[
-              Positioned.fill(
-                child: GestureDetector(
-                  onTap: _toggleSupportMenu,
-                  child: Container(
-                    color: Colors.black.withOpacity(0.15),
-                  ),
-                ),
-              ),
-              Positioned(
-                bottom: 90,
-                right: 16,
-                child: Material(
-                  color: Colors.transparent,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      _supportMenuItem(
-                        icon: Icons.smart_toy,
-                        text: "Chat with Mario",
-                        onTap: () {
-                          _toggleSupportMenu();
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const ChatBotPage()),
-                          );
-                        },
-                      ),
-                      SizedBox(height: 10),
-                      _supportMenuItem(
-                        icon: Icons.support_agent,
-                        text: "Service Centers",
-                        onTap: () {
-                          _toggleSupportMenu();
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => MapPage()),
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
+            if (_showSupportMenu) _buildSupportMenuOverlay(context),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.green,
-        elevation: 4,
-        shape: const CircleBorder(),
-        onPressed: _toggleSupportMenu,
-        child: AnimatedSwitcher(
-          duration: const Duration(milliseconds: 200),
-          child: _showSupportMenu
-              ? Icon(Icons.close,
-                  key: const ValueKey('close'), color: Colors.white, size: 32)
-              : ClipOval(
-                  key: const ValueKey('bot'),
-                  child: Image.asset(
-                    'assets/mario_bot.jpg',
-                    width: 46,
-                    height: 46,
-                    fit: BoxFit.cover,
+      floatingActionButton: _buildFloatingActionButton(),
+    );
+  }
+
+  Widget _buildTopBar(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Image.asset("assets/logo.png", height: 50.h),
+        GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => NotificationsPage()),
+            );
+          },
+          child: Icon(Icons.notifications_none, size: 26.sp),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSearchBar() {
+    return Row(
+      children: [
+        SizedBox(width: 10.w),
+        Expanded(
+          child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 12.w),
+            decoration: BoxDecoration(
+              color: Colors.grey[200],
+              borderRadius: BorderRadius.circular(20.r),
+            ),
+            child: Row(
+              children: [
+                Icon(Icons.search, color: Colors.grey),
+                SizedBox(width: 8.w),
+                Expanded(
+                  child: TextField(
+                    controller: _searchController,
+                    decoration: const InputDecoration(
+                      hintText: "Search for products",
+                      border: InputBorder.none,
+                    ),
+                    onChanged: _onSearchChanged,
                   ),
                 ),
+                Icon(Icons.mic, color: Colors.grey),
+              ],
+            ),
+          ),
         ),
+      ],
+    );
+  }
+
+  Widget _buildCategorySection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Categories',
+            style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold)),
+        SizedBox(height: 12.h),
+        _isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : SizedBox(
+                height: 60.h,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: _categories.length,
+                  itemBuilder: (context, index) {
+                    final category = _categories[index];
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => CategoryPage(
+                              categoryId: category.name,
+                              categoryName: category.name,
+                            ),
+                          ),
+                        );
+                      },
+                      child: categoryItem(category.imageBase64),
+                    );
+                  },
+                ),
+              ),
+      ],
+    );
+  }
+
+  Widget _buildHotDealsSection(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Today Hot Deals',
+            style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold)),
+        SizedBox(height: 12.h),
+        _isProductLoading
+            ? const Center(child: CircularProgressIndicator())
+            : _filteredProducts.isEmpty
+                ? const Center(child: Text('No products found.'))
+                : GridView.builder(
+                    itemCount: _filteredProducts.length,
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      mainAxisSpacing: 16.h,
+                      crossAxisSpacing: 16.w,
+                      childAspectRatio: 0.7,
+                    ),
+                    itemBuilder: (context, index) {
+                      return dealCard(context, _filteredProducts[index]);
+                    },
+                  ),
+      ],
+    );
+  }
+
+  Widget _buildSupportMenuOverlay(BuildContext context) {
+    return Stack(
+      children: [
+        Positioned.fill(
+          child: GestureDetector(
+            onTap: _toggleSupportMenu,
+            child: Container(color: Colors.black.withOpacity(0.15)),
+          ),
+        ),
+        Positioned(
+          bottom: 90,
+          right: 16,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              _supportMenuItem(
+                icon: Icons.smart_toy,
+                text: "Chat with Mario",
+                onTap: () {
+                  _toggleSupportMenu();
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const ChatBotPage()),
+                  );
+                },
+              ),
+              SizedBox(height: 10),
+              _supportMenuItem(
+                icon: Icons.support_agent,
+                text: "Service Centers",
+                onTap: () {
+                  _toggleSupportMenu();
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => MapPage()),
+                  );
+                },
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFloatingActionButton() {
+    return FloatingActionButton(
+      backgroundColor: Colors.green,
+      elevation: 4,
+      shape: const CircleBorder(),
+      onPressed: _toggleSupportMenu,
+      child: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 200),
+        child: _showSupportMenu
+            ? Icon(Icons.close,
+                key: const ValueKey('close'), color: Colors.white, size: 32)
+            : ClipOval(
+                key: const ValueKey('bot'),
+                child: Image.asset(
+                  'assets/mario_bot.jpg',
+                  width: 46,
+                  height: 46,
+                  fit: BoxFit.cover,
+                ),
+              ),
       ),
     );
   }
 
-  Widget _supportMenuItem(
-      {required IconData icon,
-      required String text,
-      required VoidCallback onTap}) {
+  Widget _supportMenuItem({
+    required IconData icon,
+    required String text,
+    required VoidCallback onTap,
+  }) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -335,17 +351,26 @@ class _HomePageState extends State<HomePage>
   }
 
   Widget categoryItem(String imageBase64) {
-    final bytes = base64Decode(imageBase64);
-    return Padding(
-      padding: EdgeInsets.only(right: 12.w),
-      child: CircleAvatar(
-        radius: 30.r,
-        backgroundColor: Colors.grey[200],
-        backgroundImage: MemoryImage(bytes),
-        onBackgroundImageError: (exception, stackTrace) =>
-            const AssetImage('assets/placeholder_image.png') as ImageProvider,
-      ),
-    );
+    try {
+      final bytes = base64Decode(imageBase64);
+      return Padding(
+        padding: EdgeInsets.only(right: 12.w),
+        child: CircleAvatar(
+          radius: 30.r,
+          backgroundColor: Colors.grey[200],
+          backgroundImage: MemoryImage(bytes),
+        ),
+      );
+    } catch (_) {
+      return Padding(
+        padding: EdgeInsets.only(right: 12.w),
+        child: CircleAvatar(
+          radius: 30.r,
+          backgroundColor: Colors.grey[200],
+          backgroundImage: const AssetImage('assets/placeholder_image.png'),
+        ),
+      );
+    }
   }
 
   Widget dealCard(BuildContext context, Product product) {
@@ -355,9 +380,7 @@ class _HomePageState extends State<HomePage>
         borderRadius: BorderRadius.circular(12.r),
         boxShadow: [
           BoxShadow(
-              color: Colors.black12,
-              blurRadius: 6.r,
-              offset: const Offset(0, 2)),
+              color: Colors.black12, blurRadius: 6.r, offset: Offset(0, 2)),
         ],
       ),
       child: InkWell(
@@ -381,18 +404,12 @@ class _HomePageState extends State<HomePage>
                       width: double.infinity,
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) => Image.asset(
-                        'assets/placeholder_image.png',
-                        height: 100.h,
-                        width: double.infinity,
-                        fit: BoxFit.cover,
-                      ),
+                          'assets/placeholder_image.png',
+                          height: 100.h,
+                          width: double.infinity),
                     )
-                  : Image.asset(
-                      'assets/placeholder_image.png',
-                      height: 100.h,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                    ),
+                  : Image.asset('assets/placeholder_image.png',
+                      height: 100.h, width: double.infinity),
             ),
             Padding(
               padding: EdgeInsets.all(8.w),
@@ -431,11 +448,8 @@ class _HomePageState extends State<HomePage>
                         "${product.sold} sold",
                         style: TextStyle(fontSize: 10.sp, color: Colors.grey),
                       ),
-                      Icon(
-                        Icons.shopping_cart,
-                        color: Colors.green,
-                        size: 16.sp,
-                      ),
+                      Icon(Icons.shopping_cart,
+                          color: Colors.green, size: 16.sp),
                     ],
                   ),
                 ],
@@ -446,8 +460,4 @@ class _HomePageState extends State<HomePage>
       ),
     );
   }
-}
-
-extension on String {
-  String get first => isNotEmpty ? this[0] : '';
 }
