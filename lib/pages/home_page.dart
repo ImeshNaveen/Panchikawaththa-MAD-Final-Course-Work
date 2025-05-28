@@ -263,8 +263,7 @@ class _HomePageState extends State<HomePage>
                           _toggleSupportMenu();
                           Navigator.push(
                             context,
-                            MaterialPageRoute(
-                                builder: (context) => ServiceCentersPage()),
+                            MaterialPageRoute(builder: (context) => MapPage()),
                           );
                         },
                       ),

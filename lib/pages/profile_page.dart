@@ -1,3 +1,4 @@
+// Import statements
 import 'dart:convert';
 import 'dart:typed_data';
 
@@ -16,6 +17,7 @@ import 'package:panchikawaththa/pages/save_card_page.dart';
 import 'package:panchikawaththa/pages/store_coupon_page.dart';
 import 'package:panchikawaththa/pages/setting_page.dart';
 import 'package:panchikawaththa/pages/notification.dart';
+import 'package:panchikawaththa/pages/user_products_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -165,6 +167,7 @@ class _AccountPageState extends State<AccountPage> {
       body: SafeArea(
         child: Column(
           children: [
+            // AppBar section
             Padding(
               padding:
                   const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
@@ -190,6 +193,8 @@ class _AccountPageState extends State<AccountPage> {
                 ],
               ),
             ),
+
+            // Profile section
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Container(
@@ -260,7 +265,6 @@ class _AccountPageState extends State<AccountPage> {
                           ),
                         ),
                         const SizedBox(height: 8),
-                        // Admin Panel Button — visible only if user role is admin
                         if (userModel!.status == 'admin')
                           Align(
                             alignment: Alignment.centerLeft,
@@ -297,6 +301,8 @@ class _AccountPageState extends State<AccountPage> {
                 ),
               ),
             ),
+
+            // Menu
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Row(
@@ -329,7 +335,10 @@ class _AccountPageState extends State<AccountPage> {
                 ],
               ),
             ),
+
             const Divider(height: 32),
+
+            // Recent Purchases + My Products button
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Row(
@@ -338,19 +347,40 @@ class _AccountPageState extends State<AccountPage> {
                   const Text('Recent Purchases',
                       style:
                           TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                  GestureDetector(
-                    onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const RecentPurchasesPage())),
-                    child: const Text('Show all',
-                        style: TextStyle(
-                            color: Colors.blue, fontWeight: FontWeight.bold)),
+                  Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => RecentPurchasesPage())),
+                        child: const Text('Show all',
+                            style: TextStyle(
+                                color: Colors.blue,
+                                fontWeight: FontWeight.bold)),
+                      ),
+                      const SizedBox(width: 16),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => UserProductsPage()),
+                          );
+                        },
+                        child: const Text('See My Products',
+                            style: TextStyle(
+                                color: Colors.green,
+                                fontWeight: FontWeight.bold)),
+                      ),
+                    ],
                   ),
                 ],
               ),
             ),
+
             const SizedBox(height: 16),
+
             Expanded(
               child: ListView(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),

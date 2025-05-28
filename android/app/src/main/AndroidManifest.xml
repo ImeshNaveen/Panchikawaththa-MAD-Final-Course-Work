@@ -13,6 +13,8 @@
     <uses-permission android:name="android.permission.INTERNET"/>
 
 
+
+
     <application
         android:enableOnBackInvokedCallback="true"
         android:label="panchikawaththa"
@@ -43,6 +45,11 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyCkc4kcGCr5gsv_UF1ujrclfDjg8wEwvjQ"/>
+        <!-- Required for Google Maps -->     
     </application>
 
     <!--  For querying apps that can process text (Flutter default) -->
