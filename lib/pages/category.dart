@@ -1,153 +1,178 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:panchikawaththa/utils/dialogs.dart';
+import 'package:panchikawaththa/models/product_model.dart';
+import 'package:panchikawaththa/services/ProductService.dart';
+import 'package:panchikawaththa/pages/productDetailpage.dart';
 
-class CategoryPage extends StatelessWidget {
-  CategoryPage({super.key});
+class CategoryPage extends StatefulWidget {
+  final String categoryId;
+  final String categoryName;
 
-  final List<Map<String, dynamic>> items = [
-    {
-      'title': '4 Tires Atlas Paraller 4x4 HP 235/60R17 102V XL',
-      'price': 93923.83,
-      'rating': 5,
-      'sold': 725,
-      'image': 'assets/wheel.jpg',
-    },
-    {
-      'title': 'Disk Cepek Black DC-2 Aluminum Wheels 119431',
-      'price': 82999.86,
-      'rating': 4,
-      'sold': 542,
-      'image': 'assets/wheel.jpg',
-    },
-    {
-      'title': 'Complete Spare Tire Kit 18" + Tools Carrying Case',
-      'price': 102748.73,
-      'rating': 5,
-      'sold': 389,
-      'image': 'assets/wheel.jpg',
-    },
-    {
-      'title': 'Scissor Jack Vehicle Wind Up Lift + Wrench',
-      'price': 10069.92,
-      'rating': 4,
-      'sold': 146,
-      'image': 'assets/wheel.jpg',
-    },
-    {
-      'title': 'Off-road Monster Tires Set with Yellow Hubs',
-      'price': 120000.00,
-      'rating': 5,
-      'sold': 215,
-      'image': 'assets/wheel.jpg',
-    },
-    {
-      'title': 'Blue Chrome Alloy Wheels (Set of 4)',
-      'price': 59999.50,
-      'rating': 3,
-      'sold': 312,
-      'image': 'assets/wheel.jpg',
-    },
-  ];
+  const CategoryPage({
+    super.key,
+    required this.categoryId,
+    required this.categoryName,
+  });
 
-  Widget _buildStars(int count) {
-    return Row(
-      children: List.generate(5, (i) {
-        return Icon(Icons.star,
-            color: i < count ? Colors.amber : Colors.grey[300], size: 12.sp);
-      }),
-    );
+  @override
+  State<CategoryPage> createState() => _CategoryPageState();
+}
+
+class _CategoryPageState extends State<CategoryPage> {
+  List<Product> _products = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCategoryProducts();
+  }
+
+  Future<void> _loadCategoryProducts() async {
+    try {
+      final allProducts = await ProductService().getProducts();
+      final categoryProducts = allProducts
+          .where((product) => product.category == widget.categoryId)
+          .toList();
+      setState(() {
+        _products = categoryProducts;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error loading category products: $e')),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          widget.categoryName,
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: const Color.fromARGB(255, 63, 204, 70),
+      ),
       body: Padding(
-        padding: EdgeInsets.only(left: 12.w, right: 12.w, top: 40.h),
+        padding: EdgeInsets.all(16.w),
+        child: _isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : _products.isEmpty
+                ? const Center(child: Text('No products found.'))
+                : GridView.builder(
+                    itemCount: _products.length,
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      mainAxisSpacing: 16.h,
+                      crossAxisSpacing: 16.w,
+                      childAspectRatio: 0.7,
+                    ),
+                    itemBuilder: (context, index) {
+                      final product = _products[index];
+                      return dealCard(context, product);
+                    },
+                  ),
+      ),
+    );
+  }
+
+  Widget dealCard(BuildContext context, Product product) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12.r),
+        boxShadow: [
+          BoxShadow(
+              color: Colors.black12,
+              blurRadius: 6.r,
+              offset: const Offset(0, 2)),
+        ],
+      ),
+      child: InkWell(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ProductDetailPage(productId: product.id),
+            ),
+          );
+        },
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Top Bar
-            Row(
-              children: [
-                GestureDetector(
-                  onTap: () {
-                    Navigator.pop(
-                        context); // Navigate back to previous/home screen
-                  },
-                  child: Icon(Icons.arrow_back),
-                ),
-                SizedBox(width: 8.w),
-                Text(
-                  'Wheels, Tires & Parts',
-                  style:
-                      TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
-                ),
-                Spacer(),
-                IconButton(
-                  icon: Icon(Icons.filter_list),
-                  onPressed: () => showFilterPopup(context),
-                ),
-              ],
+            ClipRRect(
+              borderRadius: BorderRadius.vertical(top: Radius.circular(12.r)),
+              child: product.imageBase64.isNotEmpty
+                  ? Image.memory(
+                      base64Decode(product.imageBase64.first),
+                      height: 100.h,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => Image.asset(
+                        'assets/placeholder_image.png',
+                        height: 100.h,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                      ),
+                    )
+                  : Image.asset(
+                      'assets/placeholder_image.png',
+                      height: 100.h,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                    ),
             ),
-            SizedBox(height: 16.h),
-            // Grid View
-            Expanded(
-              child: GridView.builder(
-                itemCount: items.length,
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  mainAxisExtent: 260.h,
-                  crossAxisSpacing: 10.w,
-                  mainAxisSpacing: 12.h,
-                ),
-                itemBuilder: (context, index) {
-                  final item = items[index];
-                  return Container(
-                    padding: EdgeInsets.all(8.w),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12.r),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.shade200,
-                          blurRadius: 6,
-                          offset: Offset(0, 3),
-                        )
-                      ],
+            Padding(
+              padding: EdgeInsets.all(8.w),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: List.generate(
+                      5,
+                      (index) => Icon(
+                        Icons.star,
+                        color: index < product.rating.round()
+                            ? Colors.amber
+                            : Colors.grey,
+                        size: 14.sp,
+                      ),
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Image.asset(item['image'],
-                            height: 100.h, fit: BoxFit.contain),
-                        SizedBox(height: 6.h),
-                        Text(
-                          item['title'],
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(fontSize: 13.sp),
-                        ),
-                        SizedBox(height: 4.h),
-                        Text("LKR ${item['price'].toStringAsFixed(2)}",
-                            style: TextStyle(
-                                fontSize: 14.sp, fontWeight: FontWeight.bold)),
-                        SizedBox(height: 4.h),
-                        _buildStars(item['rating']),
-                        SizedBox(height: 2.h),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text("${item['sold']} sold",
-                                style: TextStyle(fontSize: 11.sp)),
-                            Icon(Icons.local_shipping,
-                                size: 16.sp, color: Colors.green),
-                          ],
-                        ),
-                      ],
-                    ),
-                  );
-                },
+                  ),
+                  SizedBox(height: 4.h),
+                  Text(
+                    product.name,
+                    style:
+                        TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w500),
+                    maxLines: 2,
+                  ),
+                  SizedBox(height: 4.h),
+                  Text(
+                    "LKR ${product.price.toStringAsFixed(2)}",
+                    style: TextStyle(fontSize: 12.sp, color: Colors.black87),
+                  ),
+                  SizedBox(height: 4.h),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "${product.sold} sold",
+                        style: TextStyle(fontSize: 10.sp, color: Colors.grey),
+                      ),
+                      Icon(
+                        Icons.shopping_cart,
+                        color: Colors.green,
+                        size: 16.sp,
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
           ],

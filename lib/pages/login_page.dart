@@ -299,7 +299,7 @@ class _LoginPageState extends State<LoginPage> {
 }
 
 class MainLayout extends StatelessWidget {
-  final UserModel userData; // or whatever type userData is
+  final UserModel userData;
 
   const MainLayout({Key? key, required this.userData}) : super(key: key);
 
@@ -309,9 +309,6 @@ class MainLayout extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('Main Layout'),
-      ),
-      body: Center(
-        child: Text('Welcome, ${userData.name}'), // Example usage
       ),
     );
   }
