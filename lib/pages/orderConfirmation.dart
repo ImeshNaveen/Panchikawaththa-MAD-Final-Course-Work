@@ -3,14 +3,39 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import '../models/Product_Model.dart';
 
-class OrderConfirmationPage extends StatelessWidget {
+class OrderConfirmationPage extends StatefulWidget {
   final Product product;
 
   const OrderConfirmationPage({Key? key, required this.product})
       : super(key: key);
 
   @override
+  State<OrderConfirmationPage> createState() => _OrderConfirmationPageState();
+}
+
+class _OrderConfirmationPageState extends State<OrderConfirmationPage> {
+  int quantity = 1;
+
+  double get total => (widget.product.price ?? 0.0) * quantity;
+
+  Uint8List _decodeImage(List<String>? imageList) {
+    if (imageList == null || imageList.isEmpty) return Uint8List(0);
+    final imageStr = imageList.first;
+    try {
+      if (imageStr.startsWith('data:image')) {
+        return Uri.parse(imageStr).data!.contentAsBytes();
+      } else {
+        return base64Decode(imageStr);
+      }
+    } catch (e) {
+      return Uint8List(0);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final product = widget.product;
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -29,13 +54,13 @@ class OrderConfirmationPage extends StatelessWidget {
         padding: EdgeInsets.all(16),
         child: Column(
           children: [
-            _buildProductCard(),
+            _buildProductCard(product),
             SizedBox(height: 16),
             _buildAddressSection(),
             SizedBox(height: 16),
             _buildPaymentSection(),
             SizedBox(height: 16),
-            _buildSummarySection(),
+            _buildSummarySection(product),
             SizedBox(height: 16),
             _buildTotalSection(),
             SizedBox(height: 20),
@@ -47,7 +72,7 @@ class OrderConfirmationPage extends StatelessWidget {
     );
   }
 
-  Widget _buildProductCard() {
+  Widget _buildProductCard(Product product) {
     return Container(
       padding: EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -85,11 +110,21 @@ class OrderConfirmationPage extends StatelessWidget {
                         SizedBox(height: 8),
                         Row(
                           children: [
-                            _buildCounterButton(Icons.remove),
+                            _buildCounterButton(Icons.remove, () {
+                              if (quantity > 1) {
+                                setState(() {
+                                  quantity--;
+                                });
+                              }
+                            }),
                             SizedBox(width: 5),
-                            Text('1'),
+                            Text(quantity.toString()),
                             SizedBox(width: 5),
-                            _buildCounterButton(Icons.add),
+                            _buildCounterButton(Icons.add, () {
+                              setState(() {
+                                quantity++;
+                              });
+                            }),
                           ],
                         ),
                         SizedBox(height: 8),
@@ -115,29 +150,17 @@ class OrderConfirmationPage extends StatelessWidget {
     );
   }
 
-  Uint8List _decodeImage(List<String>? imageList) {
-    if (imageList == null || imageList.isEmpty) return Uint8List(0);
-
-    final imageStr = imageList.first;
-    try {
-      if (imageStr.startsWith('data:image')) {
-        return Uri.parse(imageStr).data!.contentAsBytes();
-      } else {
-        return base64Decode(imageStr);
-      }
-    } catch (e) {
-      return Uint8List(0);
-    }
-  }
-
-  Widget _buildCounterButton(IconData icon) {
-    return Container(
-      padding: EdgeInsets.all(4),
-      decoration: BoxDecoration(
-        color: Colors.grey[300],
-        borderRadius: BorderRadius.circular(4),
+  Widget _buildCounterButton(IconData icon, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.all(4),
+        decoration: BoxDecoration(
+          color: Colors.grey[300],
+          borderRadius: BorderRadius.circular(4),
+        ),
+        child: Icon(icon, size: 16),
       ),
-      child: Icon(icon, size: 16),
     );
   }
 
@@ -169,14 +192,14 @@ class OrderConfirmationPage extends StatelessWidget {
     );
   }
 
-  Widget _buildSummarySection() {
-    final price = product.price ?? 0.0;
+  Widget _buildSummarySection(Product product) {
+    final subtotal = (product.price ?? 0.0) * quantity;
 
     return _buildInfoCard(
       title: 'Summary',
       content: Column(
         children: [
-          _buildRowText('Subtotal', 'LKR ${price.toStringAsFixed(2)}'),
+          _buildRowText('Subtotal', 'LKR ${subtotal.toStringAsFixed(2)}'),
           Divider(),
           _buildRowText('Promo codes', 'Enter', isLink: true),
           Divider(),
@@ -187,15 +210,13 @@ class OrderConfirmationPage extends StatelessWidget {
   }
 
   Widget _buildTotalSection() {
-    final price = product.price ?? 0.0;
-
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text('Total :',
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
         Text(
-          'LKR ${price.toStringAsFixed(2)}',
+          'LKR ${total.toStringAsFixed(2)}',
           style: TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 18,
@@ -210,7 +231,9 @@ class OrderConfirmationPage extends StatelessWidget {
       child: ElevatedButton(
         onPressed: () {
           // Handle payment logic here
-          // Show snackbar or navigate to payment screen
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text('Payment processing...'),
+          ));
         },
         style: ElevatedButton.styleFrom(
           shape: StadiumBorder(),

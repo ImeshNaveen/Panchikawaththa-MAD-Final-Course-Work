@@ -62,6 +62,22 @@ class _CartPageState extends State<CartPage> {
     fetchCartItems();
   }
 
+  Future<void> deleteSelectedItems() async {
+    final itemsToDelete = <String>[];
+
+    for (int i = 0; i < selectedItems.length; i++) {
+      if (selectedItems[i]) {
+        itemsToDelete.add(cartItems[i].id);
+      }
+    }
+
+    for (final id in itemsToDelete) {
+      await FirebaseFirestore.instance.collection('cart').doc(id).delete();
+    }
+
+    await fetchCartItems(); // Refresh after deletion
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -79,14 +95,20 @@ class _CartPageState extends State<CartPage> {
                     style: TextStyle(
                         fontSize: 18.sp, fontWeight: FontWeight.bold)),
                 const Spacer(),
-                const Icon(Icons.delete_outline),
+                GestureDetector(
+                  onTap: () async {
+                    await deleteSelectedItems();
+                  },
+                  child: const Icon(Icons.delete_outline),
+                ),
               ],
             ),
             SizedBox(height: 16.h),
             Row(
               children: [
                 Checkbox(
-                  value: selectedItems.every((item) => item),
+                  value: selectedItems.isNotEmpty &&
+                      selectedItems.every((item) => item),
                   onChanged: (value) {
                     setState(() {
                       selectedItems =
@@ -173,18 +195,26 @@ class _CartPageState extends State<CartPage> {
         padding: EdgeInsets.all(16.w),
         child: ElevatedButton(
           onPressed: () {
-            // Payment logic
+            // TODO: Add your payment logic here
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Payment processing...')),
+            );
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: const Color(0xFF02B91A),
-            padding: EdgeInsets.symmetric(vertical: 14.h),
+            padding: EdgeInsets.symmetric(vertical: 14),
             shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(30.r)),
+              borderRadius: BorderRadius.circular(30),
+            ),
           ),
           child: Text(
             'Pay Now\nLKR ${total.toStringAsFixed(2)}',
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
           ),
         ),
       ),

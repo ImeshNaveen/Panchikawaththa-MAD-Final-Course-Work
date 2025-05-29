@@ -50,7 +50,7 @@ class NotificationsPage extends StatelessWidget {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             print("Error: ${snapshot.error}");
-            return const Center(child: Text('Error loading notifications'));
+            return const Center(child: Text('No notifications'));
           } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
             return const Center(child: Text('No notifications'));
           }
