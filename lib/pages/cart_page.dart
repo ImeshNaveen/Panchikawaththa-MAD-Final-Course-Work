@@ -195,7 +195,6 @@ class _CartPageState extends State<CartPage> {
         padding: EdgeInsets.all(16.w),
         child: ElevatedButton(
           onPressed: () {
-            // TODO: Add your payment logic here
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text('Payment processing...')),
             );
