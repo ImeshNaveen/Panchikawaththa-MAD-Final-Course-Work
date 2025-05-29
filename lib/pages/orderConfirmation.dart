@@ -1,26 +1,50 @@
+import 'dart:convert';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import '../models/Product_Model.dart';
 
-void main() => runApp(OrderConfirmationApp());
+class OrderConfirmationPage extends StatefulWidget {
+  final Product product;
 
-class OrderConfirmationApp extends StatelessWidget {
+  const OrderConfirmationPage({Key? key, required this.product})
+      : super(key: key);
+
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: OrderConfirmationPage(),
-      debugShowCheckedModeBanner: false,
-    );
-  }
+  State<OrderConfirmationPage> createState() => _OrderConfirmationPageState();
 }
 
-class OrderConfirmationPage extends StatelessWidget {
+class _OrderConfirmationPageState extends State<OrderConfirmationPage> {
+  int quantity = 1;
+
+  double get total => (widget.product.price ?? 0.0) * quantity;
+
+  Uint8List _decodeImage(List<String>? imageList) {
+    if (imageList == null || imageList.isEmpty) return Uint8List(0);
+    final imageStr = imageList.first;
+    try {
+      if (imageStr.startsWith('data:image')) {
+        return Uri.parse(imageStr).data!.contentAsBytes();
+      } else {
+        return base64Decode(imageStr);
+      }
+    } catch (e) {
+      return Uint8List(0);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final product = widget.product;
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.white,
-        leading: Icon(Icons.arrow_back, color: Colors.black),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => Navigator.pop(context),
+        ),
         title: Text(
           'Order Confirmation',
           style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
@@ -30,13 +54,13 @@ class OrderConfirmationPage extends StatelessWidget {
         padding: EdgeInsets.all(16),
         child: Column(
           children: [
-            _buildProductCard(),
+            _buildProductCard(product),
             SizedBox(height: 16),
             _buildAddressSection(),
             SizedBox(height: 16),
             _buildPaymentSection(),
             SizedBox(height: 16),
-            _buildSummarySection(),
+            _buildSummarySection(product),
             SizedBox(height: 16),
             _buildTotalSection(),
             SizedBox(height: 20),
@@ -48,7 +72,7 @@ class OrderConfirmationPage extends StatelessWidget {
     );
   }
 
-  Widget _buildProductCard() {
+  Widget _buildProductCard(Product product) {
     return Container(
       padding: EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -60,14 +84,18 @@ class OrderConfirmationPage extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('MD Store', style: TextStyle(fontWeight: FontWeight.bold)),
+              Text(product.sellerId ?? 'Unknown Seller',
+                  style: TextStyle(fontWeight: FontWeight.bold)),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Image.network(
-                    'assets/dvd.jpg',
+                  Image.memory(
+                    _decodeImage(product.imageBase64),
                     width: 70,
                     height: 70,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) =>
+                        Icon(Icons.broken_image),
                   ),
                   SizedBox(width: 10),
                   Expanded(
@@ -75,22 +103,36 @@ class OrderConfirmationPage extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          '7.8" Inch Portable DVD Player Swivel Screen 270° Multi Region In Car USB Charger',
-                          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                          product.name ?? 'Unnamed Product',
+                          style: TextStyle(
+                              fontSize: 14, fontWeight: FontWeight.w500),
                         ),
                         SizedBox(height: 8),
                         Row(
                           children: [
-                            _buildCounterButton(Icons.remove),
+                            _buildCounterButton(Icons.remove, () {
+                              if (quantity > 1) {
+                                setState(() {
+                                  quantity--;
+                                });
+                              }
+                            }),
                             SizedBox(width: 5),
-                            Text('1'),
+                            Text(quantity.toString()),
                             SizedBox(width: 5),
-                            _buildCounterButton(Icons.add),
+                            _buildCounterButton(Icons.add, () {
+                              setState(() {
+                                quantity++;
+                              });
+                            }),
                           ],
                         ),
                         SizedBox(height: 8),
-                        Text('Free Shipping', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
-                        Text('Delivery : Oct 28 - 30', style: TextStyle(fontSize: 12)),
+                        Text('Free Shipping',
+                            style: TextStyle(
+                                fontSize: 12, fontWeight: FontWeight.bold)),
+                        Text('Delivery : Oct 28 - 30',
+                            style: TextStyle(fontSize: 12)),
                       ],
                     ),
                   ),
@@ -108,14 +150,17 @@ class OrderConfirmationPage extends StatelessWidget {
     );
   }
 
-  Widget _buildCounterButton(IconData icon) {
-    return Container(
-      padding: EdgeInsets.all(4),
-      decoration: BoxDecoration(
-        color: Colors.grey[300],
-        borderRadius: BorderRadius.circular(4),
+  Widget _buildCounterButton(IconData icon, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.all(4),
+        decoration: BoxDecoration(
+          color: Colors.grey[300],
+          borderRadius: BorderRadius.circular(4),
+        ),
+        child: Icon(icon, size: 16),
       ),
-      child: Icon(icon, size: 16),
     );
   }
 
@@ -124,8 +169,8 @@ class OrderConfirmationPage extends StatelessWidget {
       title: 'Address',
       content: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('John Snow +94 0769423846'),
+        children: const [
+          Text('janith chamuditha +94 0769767966'),
           Text('No 34, Dematagoda , Maradana'),
           Text('Colombo, Western, Sri Lanka ,10300'),
         ],
@@ -137,29 +182,28 @@ class OrderConfirmationPage extends StatelessWidget {
     return _buildInfoCard(
       title: 'Payment method',
       content: Row(
-        children: [
-          Image.network(
-            'assests/visa.png',
-            width: 40,
-            height: 24,
-          ),
+        children: const [
+          Icon(Icons.credit_card, size: 24),
           SizedBox(width: 10),
-          Text('4216 67** **** 3456', style: TextStyle(fontWeight: FontWeight.bold)),
+          Text('4216 67** **** 3456',
+              style: TextStyle(fontWeight: FontWeight.bold)),
         ],
       ),
     );
   }
 
-  Widget _buildSummarySection() {
+  Widget _buildSummarySection(Product product) {
+    final subtotal = (product.price ?? 0.0) * quantity;
+
     return _buildInfoCard(
       title: 'Summary',
       content: Column(
         children: [
-          _buildRowText('Subtotal', 'LKR 16,630'),
+          _buildRowText('Subtotal', 'LKR ${subtotal.toStringAsFixed(2)}'),
           Divider(),
-          _buildRowText('Promo codes', 'Enter'),
+          _buildRowText('Promo codes', 'Enter', isLink: true),
           Divider(),
-          _buildRowText('shiping fee', 'free'),
+          _buildRowText('Shipping fee', 'Free'),
         ],
       ),
     );
@@ -169,8 +213,15 @@ class OrderConfirmationPage extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text('Total :', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-        Text('LKR 16,630', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.red[900])),
+        Text('Total :',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+        Text(
+          'LKR ${total.toStringAsFixed(2)}',
+          style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+              color: Colors.red[900]),
+        ),
       ],
     );
   }
@@ -178,14 +229,23 @@ class OrderConfirmationPage extends StatelessWidget {
   Widget _buildPayNowButton() {
     return Center(
       child: ElevatedButton(
-        onPressed: () {},
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 14),
-          child: Text('Pay now', style: TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.bold,)),
-        ),
+        onPressed: () {
+          // Handle payment logic here
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text('Payment processing...'),
+          ));
+        },
         style: ElevatedButton.styleFrom(
           shape: StadiumBorder(),
           backgroundColor: Color(0xFF01B919),
+        ),
+        child: const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 40, vertical: 14),
+          child: Text(
+            'Pay now',
+            style: TextStyle(
+                fontSize: 16, color: Colors.white, fontWeight: FontWeight.bold),
+          ),
         ),
       ),
     );
@@ -226,6 +286,3 @@ class OrderConfirmationPage extends StatelessWidget {
     );
   }
 }
-
-
-

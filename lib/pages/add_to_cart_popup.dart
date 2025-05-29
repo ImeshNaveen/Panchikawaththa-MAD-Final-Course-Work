@@ -1,42 +1,13 @@
+import 'dart:convert';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-
-void main() {
-  runApp(const MaterialApp(
-    home: Scaffold(
-      backgroundColor: Colors.grey,
-      body: Center(child: ShowCartButton()),
-    ),
-    debugShowCheckedModeBanner: false,
-  ));
-}
-
-class ShowCartButton extends StatelessWidget {
-  const ShowCartButton({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return ElevatedButton(
-      child: const Text('Show Cart Pop-up'),
-      onPressed: () {
-        showModalBottomSheet(
-          context: context,
-          isScrollControlled: true,
-          backgroundColor: Colors.white,
-          shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-          ),
-          builder: (_) => const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-            child: CartPopupContent(),
-          ),
-        );
-      },
-    );
-  }
-}
+import '../../models/Product_Model.dart';
 
 class CartPopupContent extends StatefulWidget {
-  const CartPopupContent({super.key});
+  final Product? product;
+
+  const CartPopupContent({super.key, required this.product});
 
   @override
   State<CartPopupContent> createState() => _CartPopupContentState();
@@ -44,149 +15,104 @@ class CartPopupContent extends StatefulWidget {
 
 class _CartPopupContentState extends State<CartPopupContent> {
   int quantity = 1;
+  bool isLoading = false;
 
-  void increaseQuantity() {
+  void addToCart() async {
+    if (widget.product == null) return;
+
     setState(() {
-      quantity++;
+      isLoading = true;
     });
-  }
 
-  void decreaseQuantity() {
-    if (quantity > 1) {
-      setState(() {
-        quantity--;
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) throw Exception("User not logged in");
+
+      await FirebaseFirestore.instance.collection('cart').add({
+        'userId': user.uid,
+        'productId': widget.product!.id,
+        'name': widget.product!.name,
+        'price': widget.product!.price,
+        'imageBase64': widget.product!.imageBase64.first,
+        'quantity': quantity,
+        'dateAdded': Timestamp.now(),
       });
+
+      if (mounted) {
+        Navigator.pop(context); // Close popup
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Product added to cart")),
+        );
+      }
+    } catch (e) {
+      print("Error adding to cart: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Failed to add to cart: $e")),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Product Image
-          Container(
-            height: 180,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              color: Colors.grey[200],
+    final product = widget.product;
+
+    if (product == null) {
+      return const Center(child: Text("Product not available."));
+    }
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const SizedBox(height: 12),
+        const Text(
+          'Add to Cart',
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 16),
+        ListTile(
+          leading: product.imageBase64.isNotEmpty
+              ? Image.memory(
+                  base64Decode(product.imageBase64.first),
+                  width: 50,
+                  height: 50,
+                  fit: BoxFit.cover,
+                )
+              : const Icon(Icons.image),
+          title: Text(product.name),
+          subtitle: Text('LKR ${product.price.toStringAsFixed(2)}'),
+        ),
+        const SizedBox(height: 8),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            IconButton(
+              onPressed: quantity > 1 ? () => setState(() => quantity--) : null,
+              icon: const Icon(Icons.remove_circle_outline),
             ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Image.asset('assets/wheel.png', fit: BoxFit.contain),
-                  ),
-                ),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(20),
-                  child: Image.asset(
-                    'assets/thumb.png',
-                    height: double.infinity,
-                    fit: BoxFit.cover,
-                    width: 100,
-                  ),
-                ),
-              ],
+            Text(quantity.toString(), style: const TextStyle(fontSize: 16)),
+            IconButton(
+              onPressed: () => setState(() => quantity++),
+              icon: const Icon(Icons.add_circle_outline),
             ),
-          ),
-          const SizedBox(height: 20),
-
-          // Price
-          const Text(
-            'LKR 105,508.15',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 4),
-          const Text('Price shown before tax',
-              style: TextStyle(color: Colors.grey)),
-
-          const SizedBox(height: 12),
-          const Divider(),
-
-          // Thumbnails and Quantity
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              // Thumbnails
-              Row(
-                children: [
-                  buildThumbnail('assets/wheel.png'),
-                  const SizedBox(width: 8),
-                  buildThumbnail('assets/thumb.png'),
-                ],
+          ],
+        ),
+        const SizedBox(height: 16),
+        isLoading
+            ? const CircularProgressIndicator()
+            : ElevatedButton(
+                onPressed: addToCart,
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.black),
+                child: const Text("Confirm Add to Cart",
+                    style: TextStyle(color: Colors.white)),
               ),
-
-              // Quantity Selector
-              Row(
-                children: [
-                  const Text('Quantity', style: TextStyle(fontSize: 16)),
-                  const SizedBox(width: 8),
-                  Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey.shade300),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Row(
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.remove, size: 18),
-                          onPressed: decreaseQuantity,
-                        ),
-                        Text('$quantity'),
-                        IconButton(
-                          icon: const Icon(Icons.add, size: 18),
-                          onPressed: increaseQuantity,
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 20),
-
-          // Continue Button
-          SizedBox(
-            width: double.infinity,
-            height: 48,
-            child: ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context); // Close the popup
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(24),
-                ),
-              ),
-              child: const Text(
-                'Continue',
-                style: TextStyle(fontSize: 18),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget buildThumbnail(String imagePath) {
-    return Container(
-      width: 48,
-      height: 48,
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey.shade300),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(8),
-        child: Image.asset(imagePath, fit: BoxFit.cover),
-      ),
+        const SizedBox(height: 16),
+      ],
     );
   }
 }
